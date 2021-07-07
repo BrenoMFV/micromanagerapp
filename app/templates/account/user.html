@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% from 'helpers.html' import render_field %}
+
+{% block content %}
+<div class="user_profile">
+    <h4 class="page_header"><b>Suas informações</b></h5>
+    <p><b>Nome:</b> {{ current_user.first_name }} {{ current_user.last_name }}</p>
+    <p><b>Email:</b> {{ current_user.email }} </p>
+    <p><b>Empresa:</b> {{ current_user.company_name }} </p>
+    <p><b>CNPJ:</b> {% if current_user.cnpj %}{{ current_user.cnpj }}{% else %}Não Cadastrado{% endif %}
+    </p>
+    <p>
+        <button type="button" class="btn btn-blue me-md-2" data-bs-toggle="modal" data-bs-target="#editUserModal">
+            Editar dados
+        </button>
+        <button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+            Redefinir Senha
+        </button>
+        <button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal" data-bs-target="#changeEmailModal">
+            Alterar email
+        </button>
+    </p>
+</div>
+{% include 'account/edit_user_modal.html' %}
+{% include 'auth/change_password_modal.html' %}
+{% include 'account/change_email_modal.html' %}
+{% endblock content %}

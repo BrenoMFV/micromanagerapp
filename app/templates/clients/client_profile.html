@@ -1,0 +1,25 @@
+{% block client_profile_modal %}
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header text-center">
+				<h5 class="modal-title" id="editClientModalLabel">Editando Cliente</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form method="POST" id="editClientCategoryForm" action="{{ url_for('.edit_client_category') }}"
+					class="form-group justify-content-center">
+					{{ editCategoryForm.csrf_token }}
+					{{ render_field(editCategoryForm.old_category, class_= "form-control", div_class="col-md-12") |
+					capitalize}}
+					{{ render_field(editCategoryForm.new_category, class_="form-control", div_class="col-md-12") }}
+					<br>
+					{{ editCategoryForm.submit(class_="btn btn-green w-100 text-center") }}
+					<div id="clientCategoryError"></div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% macro render_field(field, div_class="form-group") %}
+
+<div class="{{ div_class }} ">{{ field.label(class_="form-label") }}
+  {{ field(**kwargs)|safe }}
+  <small>Mensagem de Erro</small>
+</div>
+
+{% endmacro %}

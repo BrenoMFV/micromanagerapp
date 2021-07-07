@@ -1,0 +1,25 @@
+<div class="modal fade" id="changeEmailModal" tabindex="-1" aria-labelledby="changeEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="changeEmailModalLabel">Atualizando Informações</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit" method="POST" action="{{ url_for('.change_email') }}"
+                    class="form-group justify-content-center">
+                    {{ changeEmailForm.csrf_token }}
+                    <div class="row g-3">
+                        {{ render_field(changeEmailForm.new_email, class_="form-control", div_class="col-md-12") }}
+                    </div><br>
+                    <div class="modal-footer row g-3">
+                        {{ changeEmailForm.submit(class_="btn btn-green text-center") }}
+                        <form action="{{ url_for('account.resend_email_confirmation') }}" method="post">
+                            {{ resendEmailConfirmationForm.submit(class_="btn btn-red text-center")}}
+                        </form>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

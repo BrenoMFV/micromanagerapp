@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block title %}Kitchen App - Confirme seu e-mail{% endblock %}
+
+{% block content %}
+<div class='page-header'>
+    <h1>
+        Olá, {{ current_user.first_name }}
+    </h1>
+    <h3>Você ainda não confirmou o seu email ainda.</h3>
+    <p>
+        É preciso que você realize essa confirmação antes
+        de ter acesso ao site.
+        Veja sua caixa de entrada, você já deve ter recebido um email com link de confirmação
+    </p>
+    <p>
+        Precisa de outro e-mail de confirmação?
+        <a href="{{ url_for('auth.resend_confirmation') }}">Clique aqui!</a>
+    </p>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+<!-- Register Client Category Modal -->
+<div id="registerClientCategoryModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" 
+a-labelledby="registerClientCategoryModal">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header text-center">
+				<h5 class="modal-title" id="registerClientCategoryModal">Cadastrando Categoria de Cliente</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form method="POST" action="{{ url_for('.register_client_category') }}"
+					class="form-group justify-content-center">
+					{{ registerClientCategoryForm .csrf_token }}
+					<div class="row g-3">
+						{{ render_field(registerClientCategoryForm.category_name, class="form-control", div_class="col-md-12") }}
+					</div>
+					<br>
+					{{ registerClientCategoryForm.submit(class_="btn btn-green w-100 text-center") }}
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end of register client category modal -->

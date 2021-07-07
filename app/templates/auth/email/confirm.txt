@@ -1,0 +1,13 @@
+Olá, {{ user.first_name }},
+
+Seja bem vindo ao Kitchen App.
+
+Para confirmar sua conta, por favor clique no link abaixo:
+
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+Agradecemos sua participação,
+
+Equipe Kitchen App
+
+Por favor, não responda esse e-mail, ele não é monitorado.

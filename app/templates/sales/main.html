@@ -1,0 +1,314 @@
+{% extends 'layout.html' %}
+{% from 'helpers.html' import render_field %}
+{% block content %}
+<div class="container">
+	<div class="page_header">
+		Vendas
+	</div>
+	<div class="row buttons_area">
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">
+						<!-- Crie uma nova Categoria de Produto -->
+					</h5>
+					<p class="card-text">
+						<!-- Categorias são uma boa forma de organizar e compartimentar os seus
+						clientes para obter análise de dados mais relevante e possibilitar
+						que algumas funções melhorem sua produtividade no futuro. -->
+					</p>
+					<button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal"
+						data-bs-target="#registerSaleModal">
+						Cadastrar <b>Venda</b>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">
+						<!-- Editar Categorias -->
+					</h5>
+					<p class="card-text">
+					</p>
+					<button type="button" class="btn btn-blue me-md-2" data-bs-toggle="modal"
+						data-bs-target="#deliveryDateModal">
+						Gerar Relatório de Entrega
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<h4 style='text-align: center;'>Histórico</h4>
+	<div class=" table-responsive-lg">
+		<table class='table table-hover table-striped table-bordered' id="Sales">
+			<thead>
+				<tr>
+					<th scope='col'>Data</th>
+					<th scope='col'>Cliente</th>
+					<th scope='col'>Produto(s)</th>
+					<th scope='col'>Valor Total</th>
+					<th scope='col'>Data de Entrega</th>
+					<th scope='col'>Editar</th>
+					<th scope='col'>Deletar</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for sale in sales %}
+				<td>{{ sale['date'] | DATEBR }}</td>
+				<td>{{ sale['name'] }}</td>
+				<td>
+					<ul>
+						{% for product in sale_products[sale['sale_id']] %}
+						<li>
+							<nobr>{{ product['name'] }} - {{ product['amount']|int }} unid - {{
+								product['price']|BRL }}
+							</nobr>
+						</li>
+						{% endfor %}
+					</ul>
+				</td>
+				<td>{{ sale['total_value']|BRL }}</td>
+				<td>{% if sale['delivery_date'] %}{{ sale['delivery_date'] }} {% else %} Sem entrega {% endif %}
+				</td>
+				<td>
+					<a onclick="get_sale({{ sale['sale_id'] }});" href="#">
+						Editar
+					</a>
+				</td>
+				<td>
+					<a onclick="return confirm('Tem certeza que deseja deletar essa venda?\nTodas as informações subsequentes serão deletadas!');"
+						href="{{ url_for('.delete_sale', id=sale.sale_id) }}">
+						Deletar
+					</a>
+				</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Modal for sale Registration -->
+	<div class="modal fade" id="registerSaleModal" tabindex="-1" aria-labelledby="registerSaleModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header text-center">
+					<h5 class="modal-title" id="registerSaleModalLabel">Registrando Venda</h5>
+					<br>
+					<button onclick="addField('reg');" type="button" class="btn btn-green btn-add">
+						<svg src="{{ url_for('static', filename='img/plus-circle.svg') }}" width="16" height="16"
+							fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+							<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+							<path
+								d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+						</svg>
+						Adicionar Produto
+					</button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form id='reg_sale' method="POST" action="{{ url_for('.register_sale') }}" class="form-group">
+						<div class="row g-3">
+							{{ registerSaleForm.csrf_token }}
+							{{ render_field(registerSaleForm.client, class_="form-control", div_class="reg col-md-12") }}
+						</div>
+						{% for form in registerSaleForm.products %}
+						<div class="row g-3{% if loop.index0 > 0 %} disabled{% endif %}"
+							id="reg_product_index_0{{ loop.index0 }}">
+							{% for entry in form %}
+
+							{% if entry.id.split('-')[2] == 'product' %}
+							{{ render_field(entry, class_="form-control product_input", div_class="col-md-5") }}
+							{% elif entry.id.split('-')[2] == 'partial_sale_id' %}
+							{{ render_field(entry, class_="form-control", div_class="disabled") }}
+
+							{% elif entry.id.split('-')[2] == 'price' %}
+							{{ render_field(entry, class_="form-control money", div_class="col-md-2") }}
+
+							{% else %}
+							{{ render_field(entry, class_="form-control money", div_class="col-md-2") }}
+							{% endif %}
+							{% endfor %}
+							<div class="col-md-2">
+								<br>
+								<button type="button" onclick="removeField('reg', {{ loop.index0 }});"
+									class="btn btn-red reg{% if loop.index0 == 0 %} disabled{% endif %}"
+									id="removeProductField0{{ loop.index0 }}">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+										class="bi bi-dash-circle" viewBox="0 0 16 16">
+										<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+										<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z" />
+									</svg>
+								</button>
+							</div>
+							<div class="col-md-2">
+								<span id="cost-{{ loop.index0 }}">
+
+								</span>
+							</div>
+						</div>
+						{% endfor %}
+						<div class="row g-3 reg_dates">
+						{{ render_field(registerSaleForm.date, class_="form-control", div_class="col-md-4") }}
+						{{ render_field(registerSaleForm.delivery_date, class_="form-control", div_class="col-md-4") }}
+						</div><br>
+						<div class="modal-footer">
+							{{ registerSaleForm.accept(class_="btn btn-red text-center") }}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal for editing sale -->
+	<div class="modal fade" id="editSaleModal" tabindex="-1" aria-labelledby="editSaleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header text-center">
+					<h5 class="modal-title" id="editSaleModalLabel">Editando Venda</h5>
+					<br>
+					<button onclick="addField('edit');" type="button" class="btn btn-green btn-add">
+						<svg src="{{ url_for('static', filename='img/plus-circle.svg') }}" width="16" height="16"
+							fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+							<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+							<path
+								d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+						</svg>
+						Adicionar Produto
+					</button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form id="edit_sale" method="POST" action="{{ url_for('.update_sale') }}" class="form-group">
+						<div class="row g-3">
+							{{ registerSaleForm.csrf_token }}
+							{{ render_field(registerSaleForm.sale_id, div_class='disabled') }}
+							{{ render_field(registerSaleForm.client, class_="form-control", div_class="edit col-md-12") }}
+						</div>
+						{% for form in registerSaleForm.products %}
+						<div class="row g-3{% if loop.index0 > 0 %} disabled{% endif %}"
+							id="edit_product_index_0{{ loop.index0 }}">
+							{% for entry in form %}
+
+							{% if entry.id.split('-')[2] == 'product' %}
+							{{ render_field(entry, class_="form-control product_input", div_class="col-md-6") }}
+
+							{% elif entry.id.split('-')[2] == 'partial_sale_id' %}
+							{{ render_field(entry, class_="form-control", div_class="disabled") }}
+
+							{% elif entry.id.split('-')[2] == 'price' %}
+							{{ render_field(entry, class_="form-control money", div_class="col-md-2") }}
+
+							{% else %}
+							{{ render_field(entry, class_="form-control money", div_class="col-md-2") }}
+
+							{% endif %}
+							{% endfor %}
+							<div class="col-md-2"><br>
+								<button type="button" onclick="removeField('edit', {{ loop.index0 }});"
+									class="btn btn-red edit{% if loop.index0 == 0 %} disabled{% endif %}"
+									id="removeProductField0{{ loop.index0 }}">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+										class="bi bi-dash-circle" viewBox="0 0 16 16">
+										<path
+											d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+										<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z" />
+									</svg>
+								</button>
+							</div>
+						</div>
+						{% endfor %}
+
+						<div class="row g-3 edit_dates">
+							{{ render_field(registerSaleForm.date, class_="form-control", div_class="col-md-4") }}
+							{{ render_field(registerSaleForm.delivery_date, class_="form-control", div_class="col-md-4") }}
+						</div><br>
+						<div class="modal-footer">
+							{{ registerSaleForm.accept(class_="btn btn-red w-100 text-center") }}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div id="deliveryDateModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5>Gerar Relatório</h5>
+				</div>
+				<div class="modal-body">
+					<form action="{{ url_for('.generate_pdf') }}" method="POST">
+						{{ pdfForm.csrf_token }}
+						<div class="row g-3">
+							{{ render_field(pdfForm.delivery_date, class="form-control", div_class="col-md-12") }}
+						</div>
+						<div class="modal-footer">
+							{{ pdfForm.accept(class_="btn btn-green col-md-12 text-center") }}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='script/sales.js') }}"></script>
+<script type="text/javascript">
+
+
+	function get_price(product_id){
+		$
+	}
+
+	function get_sale(id) {
+		data = { id: id };
+		$.ajax({
+			url: "{{ url_for('.get_sale') }}",
+			type: "GET",
+			data: data,
+			success: function (response) {
+				const date = formatDate(response['date']);
+				const delivery_date = response['delivery_date'] != null ? formatDate(response['delivery_date']) : null;
+
+				$("form#edit_sale input[name='sale_id']").val(response['sale_id']);
+				// client id
+				$('form#edit_sale select[name="client"] option[value="' + response['client_id'] + '"]').prop('selected', true);
+				// date
+				$("div.edit_dates div[class^='col'] input[name='date']").val(date);
+				// delivery_date
+				$("div.edit_dates div[class^='col'] input[name='delivery_date']").val(delivery_date);
+				// mudar 
+
+				for (let i = 0; i < response['products'].length; i++) {
+					$('form#edit_sale input[id="products-' + i + '-partial_sale_id"]').val(response['products'][i]['partial_id'])
+					$('form#edit_sale select[name="products-' + i + '-product"] option[value="' + response['products'][i]['product_id'] + '"]').prop('selected', true);
+					$('form#edit_sale input[name="products-' + i + '-amount"]').val(response['products'][i]['amount']);
+					$('form#edit_sale input[name="products-' + i + '-price"]').val(response['products'][i]['price']);
+					$('div#edit_product_index_0' + i + 'button.btn.btn-red').removeClass('disabled');
+					$('div#edit_product_index_0' + i).removeClass('disabled');
+				};
+
+				$('#editSaleModal').modal('show');
+
+			},
+			error: function (err) {
+				alert("Não foi possível completar a ação. Erro: " + err);
+			}
+		});
+	}
+
+
+</script>
+<script type="text/javascript" src='{{ url_for("static", filename="script/validate_sale.js") }}'></script>
+
+{% endblock script %}

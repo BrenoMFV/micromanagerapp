@@ -1,0 +1,7 @@
+<p>Olá, {{ user.first_name | safe }},</p>
+<p>Seja bem vindo ao Kitchen App.</p>
+<p>Para confirmar sua conta, por favor clique no link abaixo:</p>
+<p><a href="{{ url_for('auth.confirm', token=token, _external=True) }}">Clique aqui</a></p>
+<p>Agradecemos sua presença,</p>
+<p>Equipe Kitchen App</p>
+<p><small>Por favor, não responda esse e-mail, ele não é monitorado.</small></p>

@@ -1,0 +1,31 @@
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="editUserModalLabel">Atualizando Suas Informações</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit" method="POST" action="{{ url_for('.user_account') }}"
+                    class="form-group justify-content-center">
+                    {{ editUserForm.csrf_token }}
+                    <div class="row g-3">
+                        {{ render_field(editUserForm.first_name, class="form-control", div_class="col-md-12") }}
+                    </div>
+                    <div class="row g-3">
+                        {{ render_field(editUserForm.last_name, class_= "form-control edit", div_class="col-md-12") }}
+                    </div>
+                    <div class="row g-3">
+                        {{ render_field(editUserForm.company_name, class_='form-control', div_class="col-md-12") }}
+                    </div>
+                    <div class="row g-3">
+                        {{ render_field(editUserForm.cnpj, class="form-control cnpj", div_class="col-md-12")}}
+                    </div>
+                    <div class="modal-footer">
+                        {{ editUserForm.submit(class_="btn btn-green w-100 text-center") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

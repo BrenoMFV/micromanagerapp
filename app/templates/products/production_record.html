@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+{% from 'helpers.html' import render_field %}
+
+{% block content %}
+<h2 class="page_header">Registros de Produção</h2>
+<div class="table-responsive-lg">
+    <table class='table table-hover table-striped table-bordered' id="myProducts">
+        <thead>
+            <tr>
+                <th scope='col'>Lote</th>
+                <th scope='col'>Produto</th>
+                <th scope='col'>Categoria</th>
+                <th scope='col'>Quantidade</th>
+                <th scope='col'>Data de Produção</th>
+                <th scope='col'>Validade</th>
+                <th scope='col'>Editar</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            {% for production in productions %}
+            <tr>
+                <td>{{ production['_batch'] }}</td>
+                <td>{{ production['product_name'] }}</td>
+                <td>{{ production['category_name'] }}</td>
+                <td>{{ production['amount_produced'] }}</td>
+                <td>{{ production['production_date'] }}</td>
+                <td>{{ production['expiration_date'] }}</td>
+                <td>
+                    <a href="#" onclick="get_production({{ production['production_id'] }});return false;"
+                        style="text-decoration: underline;">Editar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
+{% include 'products/register_production_modal.html' %}
+
+{% block script %}
+<script type="text/javascript">
+    function get_production(id) {
+        data = { id: id }
+
+        $.ajax({
+            url: '{{ url_for(".get_production") }}',
+            dataType: 'json',
+            method: "GET",
+            data: data,
+            success: function (response) {
+                $('#registerProductionModal').modal('show');
+
+                $('form').attr('action', '{{ url_for(".update_production") }}');
+
+                if ($('form input[name="production_id"]').length === 0) {
+                    const productionIdField = `<input type="number" name="production_id" class="disabled" value="${response['id']}">`;
+                    $('form').append(productionIdField);
+                }
+                else {
+                    $('form input[name="production_id"]').val(response['id']);
+                }
+
+                const production_date = formatDate(response['production_date']);
+                const expiration_date = formatDate(response['expiration_date']);
+
+                $('form select#product option[value="' + response['product_id'] + '"]').prop('selected', true);
+                $('form input[name="amount_produced"]').val(response['amount_produced']);
+                $('form input#production_date').val(production_date);
+                $('form input#expiration_date').val(expiration_date);
+            },
+            error: function (err) {
+                console.error(err);
+            }
+        });
+    }
+</script>
+{% endblock script %}

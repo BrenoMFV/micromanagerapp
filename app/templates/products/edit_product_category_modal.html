@@ -1,0 +1,29 @@
+<!-- Modal for Product Category Registration -->
+<div class="modal fade" id="editProductCategoryModal" tabindex="-1" aria-labelledby="editProductCategoryModal"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="editProductCategoryModal">Registrando Produção</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('.edit_product_category') }}"
+                    class="form-group justify-content-center">
+                    {{ editProductCategoryForm.csrf_token }}
+                    <div class="row g-3">
+                        {{ render_field(editProductCategoryForm.old_category, class="form-control",
+                        div_class="col-md-12") }}
+                    </div>
+                    <div class="row g-3">
+                        {{ render_field(editProductCategoryForm.new_category, class="form-control",
+                        div_class="col-md-12") }}
+                    </div>
+                    <div class="modal-footer">
+                        {{ editProductCategoryForm.submit(class_="btn btn-green w-100 text-center") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

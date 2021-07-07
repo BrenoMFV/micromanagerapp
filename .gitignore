@@ -1,0 +1,14 @@
+venv/
+.vscode
+.__pycache__
+profiler_log/
+tests/
+data-dev.sqlite
+secret_key.txt
+user.txt
+environ.txt
+.env
+app/pitaco.md
+remainder.txt
+log.txt
+sendgrid_config

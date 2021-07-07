@@ -1,0 +1,184 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+body {
+    font-family: 'Roboto Sans', Lato;
+}
+
+header nav.navbar {
+    background-color: #ecf3e5;
+    box-shadow: 1px 1px 10px 1px rgba(19, 35, 47, 0.5);
+}
+
+a.navbar-brand {
+    color: #C66151 !important;
+    text-shadow:  2px 1px rgba(139, 139, 139, 0.582);
+}
+
+.nav-item:hover a {
+    font-weight: bold;
+    color: #C66151 !important;
+}
+
+a {
+    text-decoration: none;
+    color: #9E5948 !important;
+    transition: .5s ease;
+}
+
+a:hover {
+    color: #528d43;
+}
+
+.page_header {
+    font-size: 28px;
+    text-align: center;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+    /* background-color:greenyellow */
+}
+
+
+@media screen and (min-width: 992px) {
+    .nav-item:hover {
+        border-radius: 30%;
+    }
+}
+
+.login_form {
+    margin: auto;
+    width: 50%;
+    text-align: center;
+    padding:72px 0;
+    min-height: 350px;
+
+}
+
+
+.selected_menu {
+    color: green !important;
+    text-decoration: underline !important;
+    font-size: 18px;
+}
+
+table {
+    border: solid 1px black;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* specif areas buttons */
+div.buttons_area { 
+    padding-bottom: 50px;
+}
+
+div.buttons_area div.card { 
+    background-color:inherit;
+    border: none;
+}
+
+div.buttons_area div.card-body {
+    text-align: center;
+}
+/* end */
+
+/* card in index.html */
+
+div.dashboard { 
+    padding-bottom: 50px;
+}
+ 
+.dashboard_card{
+    border: solid 2px #528d43;
+    min-height: 235px;
+}
+
+div.dashboard div.card-title{
+    font-size: 1.5rem;
+}
+
+div.dashboard div.card-body {
+    font-size: 1rem;
+}
+
+div.dashboard p.card-text {
+    text-align: justify;
+}
+/* end */
+.modal-header .btn-add {
+    padding: .5rem .5rem;
+    margin: -.5rem -22rem -.5rem auto;
+}
+
+@media screen and (max-width: 991px) {
+    .modal-header .btn-add {
+        margin: -.1rem -1rem .5rem auto;
+    }
+}
+
+@media screen and (max-width: 415px) {
+    .modal-header .btn-add {}
+}
+
+.active {
+    font-size: 1.15rem;
+    font-weight: bold;
+}
+
+div small {
+    font-style: italic;
+    font-family: inherit;
+    bottom: 0px;
+    left: 0px;
+    color: #e74c3c;
+    display: none;
+}
+
+div small.error {
+	display: inline ;
+}
+
+
+.disabled {
+    display: none;
+}
+
+div.user_profile {
+    text-align: center;
+    margin: 10px auto;
+    width: 50%;
+    display: relative;    
+    font-size: 16px;
+    padding: 2% 5%;
+    border: solid #528d43 1px;
+    background-color: #E1E5DF;
+}
+
+.info {
+    font-size: 17px;
+}
+
+.btn-red{
+    background-color: #d44040;
+    border: 1px solid #d14d4d;
+    color: white;
+}
+
+.btn-blue{
+    background-color: #1c8fee;
+    border: 1px solid #1c8fee;
+    color: white;
+}
+
+.btn-green{
+    background-color: #528d43;
+    border: 1px solid #528d43;
+    color: white;
+}

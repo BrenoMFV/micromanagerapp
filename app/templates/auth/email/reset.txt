@@ -1,0 +1,11 @@
+Olá, {{ user.first_name | safe }},
+
+Este email contém o link solicitado para redefinir sua senha.
+
+Se você não solicitou a troca da senha, por favor, desconsidere!
+
+{{ url_for('auth.reset_password', token=token, _external=True) }}
+
+Agradecemos sua presença,
+
+Equipe Kitchen App

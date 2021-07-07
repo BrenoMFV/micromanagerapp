@@ -1,0 +1,6 @@
+<p>Olá, {{ user.first_name | safe }},</p>
+<p>Este email contém o link solicitado para redefinir sua senha.</p>
+<p>Se você não solicitou a troca da senha, por favor, desconsidere!</p>
+<p><a href="{{ url_for('auth.reset_password', token=token, _external=True) }}">Redefinir Senha</a></p>
+<p>Agradecemos sua presença,</p>
+<p>Equipe Kitchen App</p>

@@ -1,0 +1,11 @@
+Olá, {{ user.first_name }}
+
+Por favor, clique no link abaixo para confirmar este endereço de email.
+
+{{ url_for('account.change_email', token=token, external=True) }}
+
+Caso não tenha solicitado esta mudança, por favor, ignore esta mensagem.
+
+Obrigado,
+
+Kitchen App Manager

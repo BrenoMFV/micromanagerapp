@@ -1,0 +1,23 @@
+    <!-- Modal for Product Registration -->
+    <div class="modal fade" id="registerProductionModal" tabindex="-1" aria-labelledby="registerProductionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h5 class="modal-title" id="registerProductionModalLabel">Registrando Produção</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('.register_production') }}" class="form-group">
+                        {{ registerProductionForm.csrf_token }}
+                        {{ render_field(registerProductionForm.product, class_="form-control w-100") }}
+                        {{ render_field(registerProductionForm.amount_produced, class_="form-control w-50") }}
+                        {{ render_field(registerProductionForm.production_date, class_="form-control w-50") }}
+                        {{ render_field(registerProductionForm.expiration_date, class_="form-control w-50") }}
+                        <br>
+                        {{ registerProductionForm.submit(class_="btn btn-green w-100 text-center") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>

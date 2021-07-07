@@ -1,0 +1,25 @@
+<!-- Modal for Product Category Registration -->
+<div class="modal fade" id="registerProductCategoryModal" tabindex="-1" aria-labelledby="registerProductCategoryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="registerProductCategoryModalLabel">Registrar Novo Produto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('.register_product_category') }}"
+                    class="form-group justify-content-center">
+                    {{ registerProductCategoryForm.csrf_token }}
+                    <div class="row g-3">
+                        {{ render_field(registerProductCategoryForm.category_name, class="form-control",
+                        div_class="col-md-12") }}
+                    </div>
+                    <br>
+                    {{ registerProductCategoryForm.submit(class_="btn btn-green w-100 text-center") }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--  end production registration Modal -->

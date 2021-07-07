@@ -1,0 +1,145 @@
+{% extends 'layout.html' %}
+{% from 'helpers.html' import render_field %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth_form.css') }}"> {% endblock head %} {% block
+content %} {% if current_user.is_authenticated %}
+<div class="page_header">
+    Visão geral
+    <p>
+    <div class="row dashboard">
+        <div class="col-md-4">
+            <div class="card dashboard_card" id='finance_dash'>
+                <div class="card-body">
+                    <div class="card-title">
+                        Faturamento
+                        <hr>
+                    </div>
+                    <p class="card-text">
+                        Hoje: {{ income['today'] | BRL }} <br>
+                        Semanal: {{ income['week'] | BRL }} <br>
+                        Mensal: {{ income['month'] | BRL }} <br>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard_card" id='production_dash'>
+                <div class="card-body">
+                    <div class="card-title">
+                        Produção
+                        <hr>
+                    </div>
+                    <p class="card-text dashboard">
+                        Última Produção:<br>
+                        <span class="production-item">
+                            {% if last_production %}
+                            <div class="table-responsive-lg">
+                                <table class="table" style="font-size: 13px; text-align: left;">
+                                    <thead>
+                                        <tr>
+                                            <th>Produto</th>
+                                            <th>Quantidade</th>
+                                            <th>Data</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{ last_production.product_name }}</td>
+                                            <td>{{ last_production.amount_produced }}</td>
+                                            <td>{{ last_production.production_date | DATEBR }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard_card" id='sales_dash'>
+                <div class="card-body">
+                    <div class="card-title">
+                        Vendas
+                        <hr>
+                    </div>
+                    Última venda:
+                    {% if last_sale %}
+                    <ul>
+                        <li style="font-size: 13px; text-align: left;">{{ last_sale.date | DATEBR }}
+                            -
+                            {{ last_sale.name }}
+                            -
+                            {{ last_sale.total_value |BRL }}
+                        </li>
+                    </ul>
+                    {% else %}
+                    -
+                    {% endif %}
+                    <br>
+                    Próxima entrega:
+                    {% if next_delivery %}
+                    <ul>
+                        <li style="font-size: 13px; text-align: left;">
+                            {{ next_delivery.delivery_date | DATEBR }}
+                            : {{ next_delivery_count }} cliente{% if next_delivery_count > 1%}s{%endif%}.
+                        </li>
+                    </ul>
+                    {% else %}
+                    -
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row dashboard">
+    <div class="col-md-4">
+        <div class="card dashboard_card" id='products_dash'>
+            <div class="card-body">
+                <div class="card-title">
+                    Produtos
+                    <hr>
+                </div>
+                <p class="card-text">
+                    Produtos Cadastrados: {{ product_count }}<br>
+                    Com Estoque baixo: {{ stock_alert_count }}<br>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card dashboard_card" id='clients_dash'>
+            <div class="card-body">
+                <div class="card-title">
+                    Clientes
+                    <hr>
+                </div>
+                <p class="card-text dashboard">
+                    Clientes Cadastrados: {{ client_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% else %}
+<div class="container-md text-center pt-3">
+        <h3>Você está acessando o KitchenApp,</h3><br>
+        <h4>o mais novo aplicativo de controle de estoque, vendas e produção para o seu negócio.</h4><br>
+        <h5>se deseja uma conta experimentar gratuitamente a ferramenta, entre em contato com kitchenapp.admin@gmail.com.<br>
+        Se já possuir cadastro, clique abaixo para fazer login,<br>
+    e muito obrigado pela preferência!</h5><br>
+    <button type="button" class="btn btn-green">
+        <a href="{{ url_for('auth.login') }}" style="text-decoration: none; color: black;">
+            Login
+        </a>
+    </button>
+</div>
+
+</div>
+<!-- /form -->
+{% endif %} {% endblock %} {% block script %}
+{% endblock script %}

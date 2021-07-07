@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+{% from "helpers.html" import render_field %}
+
+
+{% block content %}
+<h2 class="text-center mb-3">Alterar Produto</h2>
+<br>
+<form method="POST">
+    <div class="row g-3">    
+        {{ editProductForm.csrf_token }}
+        {{ render_field(editProductForm.product_name, class="form-control", div_class="col-md-5") }}
+    </div>
+    <div class="row g-3">    
+        {{ render_field(editProductForm.product_category, class_= "form-control", div_class="col-md-5") }}
+    </div> 
+    <div class="row g-3">
+        {{ render_field(editProductForm.product_price, class_= "form-control", div_class="col-md-2") }}
+    </div>    <br>
+        {{ editProductForm.submit(class_="btn btn-green") }}
+</form>
+
+{% endblock content %}

@@ -1,0 +1,127 @@
+<head>
+    <!-- <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Roboto+sans|Lato"> -->
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        header .static_header {
+            font-size: 40 !important;
+            font-weight: bold !important;
+            padding: 30px 30px 30px 30px;
+            border: 1px solid;
+        }
+
+        header div.dynamic_header p 
+        {
+            width: 100%;
+        }
+
+        div#dynamic_header 
+        {
+            font-size: 18px;
+            margin: auto;
+        }
+
+        main div.main_block 
+        {
+            position: relative;
+            border: 1px solid;
+            margin-bottom: 20px;
+            font-size: 18px
+        }
+
+        main div.main_block div.delivery_info 
+        {
+            text-align: left;
+            border-bottom: 1px solid;
+        }
+        
+        div.delivery_info p.client_info
+        {
+            margin-left: 10px;
+        }
+
+        div.delivery_info div.delivery_value {
+            text-align: center;
+            border-left: 1px dashed;
+            border-bottom: 1px dashed;
+            background-color: white;
+            position: absolute;
+            padding-right: 10px;
+            padding-left: 10px;
+            width: 100px;
+            height: inherit;
+            top: 0%;
+            right: 0px;
+        }
+
+        div.value {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        main div.main_block div.delivery_body {
+            margin: auto auto 5px 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="static_header">
+            Lista de Entregas
+        </div>
+        <div id=dynamic_header>
+            <p>
+                <b>Empresa</b>: {{ current_user.company_name }} |
+                <b class="center">Data da entrega</b>: {{ sales['delivery_date'] }} |
+                <b>Número de pedidos</b>: {{ sales['amount_of_orders'] }}
+            </p>
+        </div>
+    </header>
+    <main>
+        {% set orders = sales['orders'] %}
+        {% for sale in orders %}
+        <div class="main_block" style="display: block;">
+            <div class="delivery_info">
+                <p class="client_info"><b>Cliente</b>: {{ orders[sale]['client']['name'] }} <b>|</b> <b>Contato</b>: ({{ orders[sale]['client']['ddd'] }}) {{
+                    orders[sale]['client']['phonenumber'] }}</p>
+                <p class="client_info"><b>Endereço</b>: {{ orders[sale]['client']['address']}}, {{
+                    orders[sale]['city'] }}</p>
+                <p class="client_info"><b>Complemento</b>: {{ orders[sale]['client']['observations'] }}</p>
+                    <div class="delivery_value">
+                    <div class="value">
+                        <p>
+                        <h2>Valor</h2>
+                        </p>
+                        <h3>{{ orders[sale]['sale_info']['value'] | BRL}}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="delivery_body">
+                <ol>
+                    <h3>Produtos:</h3>
+                    {% for product in orders[sale]['products']%}
+                    <li>
+                        <nobr> {{ product['name']}} - {{ product['amount'] | int}} unid</nobr>
+                        {% endfor %}
+                </ol>
+            </div>
+            <div class="delivery_footer">
+
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+    <footer>
+
+    </footer>
+</body>

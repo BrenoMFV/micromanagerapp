@@ -1,0 +1,49 @@
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="editProductModalLabel">Registrando Produção</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit" method="POST" action="{{ url_for('.update_product') }}"
+                    class="form-group justify-content-center">
+                    {{ editProductForm.csrf_token }}
+                    <input type="number" class='disabled' name='id'>
+                    <div class="row g-3">
+                        {{ render_field(editProductForm.product_name, class="form-control", div_class="col-md-12") }}
+                    </div>
+                    <div class="row g-3">
+                        {{ render_field(editProductForm.product_category, class_= "form-control edit", div_class="col-md-12") }}
+                    </div>
+                    <div class="row g-3">
+                        {{ render_field(editProductForm.amount, class_='form-control', div_class="col-md-6") }}
+                    </div>
+                    {% if cc_fields %}
+                        <hr>
+                        <h5 class="text-center ">Valor por Categoria de Cliente</h5>
+                        {% for field in editProductForm %}
+                            {% for cc_field in cc_fields %}
+                                {% if field.id == cc_field %}
+                                    {% if loop.index0 % 2 == 0 %}
+                                        <div class="row g-3">
+                                    {% endif %}
+                                    {{ render_field(field, class_='form-control money', div_class='col-md-6') }}
+                                    {% if loop.index0 % 2 == 1 %}
+                                        </div>
+                                    {% elif loop.last and loop.index0 % 2 == 0 %}
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                    <div class="modal-footer">
+                    {{ editProductForm.submit(class_="btn btn-green w-100 text-center") }}
+                    <input class="disabled" type="number" name="id">
+                </div>   
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

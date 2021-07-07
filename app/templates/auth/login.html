@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% from 'helpers.html' import render_field %}
+
+{% block content %}
+<div class="login_form">
+    <div id="login">
+         <h1>Login</h1>
+         <form class="form-group" action="{{ url_for('auth.login') }}" method="POST">
+             <div class="row g-1 gx-5">
+                 {{ loginForm.csrf_token }}
+                 {{ render_field(loginForm.email, class_="form-control", div_class="col-md-8 offset-md-2") }}
+             </div>
+             <div class="row g-1 gx-5">
+                 {{ render_field(loginForm.password, class_='form-control', div_class="col-md-8 offset-md-2") }}
+             </div class="row g-1 gx-5">
+             <div>
+                 {{ render_field(loginForm.remember_me)}}
+             </div class="row g-1 gx-5">
+             <p class="forgot"><a data-bs-toggle="modal" data-bs-target="#resetPasswordModal" href="#">Esqueceu a
+                     senha?</a></p>
+             {{ loginForm.submit(class_="button button-block")}}
+         </form>
+     </div>
+ </div>    
+{% endblock content %}
+    {% include 'auth/reset_password_email_modal.html' %}
+ 

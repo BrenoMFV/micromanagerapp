@@ -1,0 +1,6 @@
+<p>Olá, {{ user.first_name }}</p>
+<p>Por favor, clique no link abaixo para confirmar este endereço de email.</p>
+<p><a href="{{ url_for('account.change_email', token=token, external=True) }}">Confirmar email</a></p>
+<p>Caso não tenha solicitado esta mudança, por favor, ignore esta mensagem.</p>
+<p>Obrigado,</p>
+<p>Kitchen App Manager</p>
