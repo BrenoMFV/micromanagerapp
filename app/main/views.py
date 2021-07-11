@@ -10,7 +10,6 @@ from ..models import Client, Product, User, Production, Sale, Unit, units_defaul
 from . import main
 
 
-
 # @main.after_app_request
 # def after_request(response):
 #     for query in get_debug_queries():
@@ -29,38 +28,39 @@ def index():
     if current_user.is_authenticated:
         client_count = Client.query.options(db.load_only('name')).filter_by(
             user_id_fk=current_user.get_id()).count()
-        last_production = Production.query.join(Product, Product.product_id == Production.product_id_fk)\
-                                    .add_columns(
-                                        Production.production_date,
-                                        Product.product_name,
-                                        Production.amount_produced
-        )\
-            .filter(Production.user_id_fk == current_user.user_id)\
+        last_production = Production.query.join(Product, Product.product_id == Production.product_id_fk) \
+            .add_columns(
+            Production.production_date,
+            Product.product_name,
+            Production.amount_produced
+        ) \
+            .filter(Production.user_id_fk == current_user.user_id) \
             .order_by(Production.production_date.asc()).first()
         product_count = Product.query.options(db.load_only('product_id')).filter_by(
             user_id_fk=current_user.user_id).count()
         stock_alert_count = 0
         if product_count > 0:
-            for product in Product.query.options(db.load_only('amount', 'stock_alert')).filter_by(user_id_fk=current_user.user_id).all():
+            for product in Product.query.options(db.load_only('amount', 'stock_alert')).filter_by(
+                    user_id_fk=current_user.user_id).all():
                 if product.amount <= product.stock_alert:
                     stock_alert_count += 1
-        last_sale = Sale.query.join(Client, Sale.client_id_fk == Client.client_id)\
-                        .add_columns(
-                            Client.name,
-                            Sale.total_value,
-                            Sale.sale_id,
-                            Sale.date
-                    )\
-                        .filter(Sale.user_id_fk == current_user.user_id)\
-                        .order_by(Sale.date.desc()).first()
-        next_delivery = Sale.query.join(Client, Sale.client_id_fk == Client.client_id)\
+        last_sale = Sale.query.join(Client, Sale.client_id_fk == Client.client_id) \
+            .add_columns(
+            Client.name,
+            Sale.total_value,
+            Sale.sale_id,
+            Sale.date
+        ) \
+            .filter(Sale.user_id_fk == current_user.user_id) \
+            .order_by(Sale.date.desc()).first()
+        next_delivery = Sale.query.join(Client, Sale.client_id_fk == Client.client_id) \
             .add_columns(
             Client.name,
             Sale.total_value,
             Sale.sale_id,
             Sale.delivery_date
-        )\
-            .filter(Sale.user_id_fk == current_user.user_id, Sale.delivery_date >= date.today())\
+        ) \
+            .filter(Sale.user_id_fk == current_user.user_id, Sale.delivery_date >= date.today()) \
             .order_by(Sale.delivery_date.desc()).first()
 
         next_delivery_count = 0
@@ -69,11 +69,14 @@ def index():
                 delivery_date=next_delivery.delivery_date).count()
 
         income = dict()
-        income_today = [ sale.total_value for sale.total_value in Sale.query.filter(Sale.date >= (date.today() - timedelta(7))).all()]
-        income['today'] = sum(income_today)  
-        income_week =  [ sale.total_value for sale.total_value in Sale.query.filter(Sale.date >= (date.today() - timedelta(weeks=1))).all()]
+        income_today = [sale.total_value for sale in
+                        Sale.query.filter(Sale.date >= (date.today() - timedelta(7))).all()]
+        income['today'] = sum(income_today)
+        income_week = [sale.total_value for sale in
+                       Sale.query.filter(Sale.date >= (date.today() - timedelta(weeks=1))).all()]
         income['week'] = sum(income_week)
-        income_month = [ sale.total_value for sale.total_value in Sale.query.filter(Sale.date >= (date.today() - timedelta(30))).all() ]
+        income_month = [sale.total_value for sale in
+                        Sale.query.filter(Sale.date >= (date.today() - timedelta(30))).all()]
         income['month'] = sum(income_month)
 
         return render_template('index.html', client_count=client_count,
@@ -86,4 +89,3 @@ def index():
                                income=income,
                                )
     return render_template('index.html')
-

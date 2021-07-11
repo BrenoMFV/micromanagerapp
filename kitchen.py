@@ -1,6 +1,7 @@
 import os
 
 import click
+import jinja2
 from flask import url_for
 from flask_migrate import Migrate, upgrade
 from flask_script import Manager
@@ -20,10 +21,11 @@ config_name = os.getenv('FLASK_CONFIG') or 'default'
 app = create_app(config_name)
 migrate = Migrate(app, db)
 
-app.jinja_env.filters["PHONE"] = phone_number
-app.jinja_env.filters["BRL"] = brl
-app.jinja_env.filters['dir'] = dir
-app.jinja_env.filters['DATEBR'] = date_brz
+jinja2.filters.FILTERS["PHONE"] = phone_number
+jinja2.filters.FILTERS["BRL"] = brl
+jinja2.filters.FILTERS['dir'] = dir
+jinja2.filters.FILTERS['DATEBR'] = date_brz
+
 
 @app.shell_context_processor
 def make_shell_context():
@@ -32,7 +34,8 @@ def make_shell_context():
                 Recipe=Recipe, RecipeStep=RecipeStep, Measurement=Measurement, Address=Address,
                 Production=Production, Sale=Sale, Supplier=Supplier, PartialSale=PartialSale,
                 Unit=Unit
-            )
+                )
+
 
 @app.context_processor
 def override_url_for():
@@ -44,7 +47,7 @@ def dated_url_for(endpoint, **values):
         filename = values.get('filename', None)
         if filename:
             file_path = os.path.join(app.root_path,
-                                 endpoint, filename)
+                                     endpoint, filename)
             values['q'] = int(os.stat(file_path).st_mtime)
     return url_for(endpoint, **values)
 
@@ -71,8 +74,9 @@ def profile(host, port, length, profile_dir):
     from werkzeug.middleware.profiler import ProfilerMiddleware
     from werkzeug.serving import run_simple
     app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[length],
-                                        profile_dir=profile_dir)
+                                      profile_dir=profile_dir)
     run_simple(host, port, app, use_debugger=False)  # use run_simple instead of app.run()
+
 
 def create_test_account():
     test = User(first_name="Breno",
@@ -94,10 +98,8 @@ def create_test_account():
     except:
         raise
 
+
 @app.cli.command()
 def deploy():
     upgrade()
     create_test_account()
-
-
-
