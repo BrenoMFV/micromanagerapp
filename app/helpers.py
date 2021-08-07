@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+import datetime as dt 
 import re
 
 from flask_sqlalchemy import BaseQuery, SQLAlchemy
@@ -11,23 +11,42 @@ from app import db
 COMMON_REGEX_ERROR_MESSAGE = "Apenas números, letras e hífens."
 COMMON_REGEX = re.compile('^[A-Za-zà-úÀ-Ú][\\s\\-\\,A-Za-z0-9à-úÀ-Ú]*$')
 
-current_date = date.today()
-expiration_default = date.today() + timedelta(days=90)
 
-def date_brz(dt):
-    if dt:
-        date = dt.strftime('%d-%m-%Y')
-        return date
-    return None
 
-def phone_number(value:str):
-    return f'{value[:5]}-{value[5:]}'
+def get_current_monday():
+    today = dt.datetime.weekday(dt.date.today())
+    monday = dt.date.today() - dt.timedelta(today)
+    return monday
 
-def brl(value):
-    a = f"R$ {value:,.2f}"
-    b = a.replace(',', 'v')
-    c = b.replace('.', ',')
-    return c.replace('v', '.') 
+
+def get_week_days():
+    monday = get_current_monday()
+    weekdays = [(monday + dt.timedelta(i)).strftime('%d/%m') for i in range(0, 7)]
+    return weekdays
+
+
+current_date = dt.date.today()
+expiration_default = dt.date.today() + dt.timedelta(days=90)
+
+
+class CustomJinjaFilters():
+    @staticmethod
+    def date_brz(dt):
+        if dt:
+            date = dt.strftime('%d-%m-%Y')
+            return date
+        return None
+
+    @staticmethod
+    def phone_number(value:str):
+        return f'{value[:5]}-{value[5:]}'
+
+    @staticmethod
+    def brl(value):
+        a = f"R$ {value:,.2f}"
+        b = a.replace(',', 'v')
+        c = b.replace('.', ',')
+        return c.replace('v', '.') 
 
 
 class CommaDecimalField(DecimalField):

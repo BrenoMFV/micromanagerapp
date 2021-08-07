@@ -3,12 +3,11 @@
 <html lang="pt-br">
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- bootstrap 5.0 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <!-- end bootstrap 5.0 -->
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -19,6 +18,11 @@
     <!-- Google Fonts API -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+sans|Lato">
     <!-- END Google Fonts API -->
+    <!-- DASHBOARD CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/dashboard/dashboard.css') }}" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
+        crossorigin="anonymous"></script>
 
     {% block head %} {% endblock %}
     <title>
@@ -26,201 +30,177 @@
     </title>
 </head>
 
-<body>
-{% block navbar %}
-<header>
-    <!-- Navbar -->
-    <div class="container">
-        <nav class="navbar navbar-expand-md navbar-light bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                    {% if current_user.is_authenticated and current_user.company_name %}
-                    <h2>{{ current_user.company_name }}</h2>
-                    {% else %}
-                    <h2>Kitchen App</h2>
-                    {% endif %}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    {% if current_user.is_authenticated %}
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == url_for('main.index') %}active{% endif %}"
-                               aria-current="page" href="{{ url_for('main.index') }}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == url_for('clients.main') %}active{% endif %}"
-                               href="{{ url_for('clients.main') }}">Clientes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == url_for('sales.main') %}active{% endif %}"
-                               href="{{ url_for('sales.main') }}">Vendas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == url_for('products.main') %}active{% endif %}"
-                               href="{{ url_for('products.main') }}">Produtos</a>
-                        </li>
-                    </ul>
-                </div>
-                <li class="nav-item dropdown" style="list-style-type: none;">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        Minha conta
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item text-nowrap" href="{{ url_for('account.user_account')}}">Meus
-                            dados</a></li>
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="index.html">{% if current_user.is_authenticated %}{{
+            current_user.company_name }}{% else %}MyManagerApp{% endif %}</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+                class="fas fa-bars"></i></button>
+        <!-- Navbar Search-->
+        <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <!-- Navbar-->
+            <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#!">Settings</a></li>
+                        <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                         <li>
-                            <hr class="dropdown-divider">
+                            <hr class="dropdown-divider" />
                         </li>
-                        <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Sair</a></li>
+                        <li><a class="dropdown-item" href="#!">Logout</a></li>
                     </ul>
-                </li>
-                {% endif %}
-        </nav>
-
-    </div>
-    </div>
-    </div>
-    {% endblock %}
-</header>
-<main>
-
-    <div class="container mb-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{% if category %}{{ category }}{% else %}danger{% endif %} alert-warning alert-dismissible fade show row text-center"
-             role='alert'>
-            <div class="">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-        <!-- <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
-            <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
-                <svg class="bi me-2" width="30" height="24">
-                    <use xlink:href="#bootstrap"></use>
-                </svg>
-                <span class="fs-5 fw-semibold">Collapsible</span>
-            </a>
-            <ul class="list-unstyled ps-0">
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse"
-                            data-bs-target="#home-collapse" aria-expanded="true">
-                        Home
-                    </button>
-                    <div class="collapse show" id="home-collapse" style="">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">Overview</a></li>
-                            <li><a href="#" class="link-dark rounded">Updates</a></li>
-                            <li><a href="#" class="link-dark rounded">Reports</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                            data-bs-target="#dashboard-collapse" aria-expanded="false">
-                        Dashboard
-                    </button>
-                    <div class="collapse" id="dashboard-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">Overview</a></li>
-                            <li><a href="#" class="link-dark rounded">Weekly</a></li>
-                            <li><a href="#" class="link-dark rounded">Monthly</a></li>
-                            <li><a href="#" class="link-dark rounded">Annually</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                            data-bs-target="#orders-collapse" aria-expanded="false">
-                        Orders
-                    </button>
-                    <div class="collapse" id="orders-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">New</a></li>
-                            <li><a href="#" class="link-dark rounded">Processed</a></li>
-                            <li><a href="#" class="link-dark rounded">Shipped</a></li>
-                            <li><a href="#" class="link-dark rounded">Returned</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="border-top my-3"></li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                            data-bs-target="#account-collapse" aria-expanded="false">
-                        Account
-                    </button>
-                    <div class="collapse" id="account-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">New...</a></li>
-                            <li><a href="#" class="link-dark rounded">Profile</a></li>
-                            <li><a href="#" class="link-dark rounded">Settings</a></li>
-                            <li><a href="#" class="link-dark rounded">Sign out</a></li>
-                        </ul>
-                    </div>
                 </li>
             </ul>
-        </div> -->
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-        {% block content %} {% endblock %}
+        </div>
+    </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-ligh" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <div class="sb-sidenav-menu-heading">Central</div>
+                        <a class="nav-link" href="{{ url_for('main.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Painel
+                        </a>
 
-    </div>
-</main>
-<footer>
-    {% block footer %} {% endblock %}
-</footer>
-<!-- jQuery -->
-<script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
-<!-- Bootstrap 5 -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
-        integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js"
-        integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj"
-        crossorigin="anonymous"></script>
-<!-- DataTables -->
-<script type="text/javascript" charset="utf8"
-        src="{{ url_for('static', filename='DataTables/datatables.js') }}"></script>
-<script>
-        $(document).ready(function () {
-            $('#Clients').DataTable({
-                language: {
-                    url: '{{ url_for("static", filename="localisation/pt-br.json") }}'
-                }
+                        {# PRODUTOS #}
+                        <div class="sb-sidenav-menu-heading">Seus Produtos</div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseStock" aria-expanded="false" aria-controls="collapseLayouts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                            Estoque
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+
+                        <div class="collapse" id="collapseStock" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{{ url_for('products.main') }}">Produtos</a>
+                            </nav>
+                        </div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseProduction" aria-expanded="false" aria-controls="collapseLayouts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                            Produção
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseProduction" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{{ url_for('products.production_record') }}">Histórico</a>
+                            </nav>
+                        </div>
+                        {#
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages"
+                            aria-expanded="false" aria-controls="collapsePages">
+                            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                            Pages
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                                    data-bs-target="#pagesCollapseAuth" aria-expanded="false"
+                                    aria-controls="pagesCollapseAuth">
+                                    Authentication
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingOne"
+                                    data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a class="nav-link" href="login.html">Login</a>
+                                        <a class="nav-link" href="register.html">Register</a>
+                                        <a class="nav-link" href="password.html">Forgot Password</a>
+                                    </nav>
+                                </div>
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                                    data-bs-target="#pagesCollapseError" aria-expanded="false"
+                                    aria-controls="pagesCollapseError">
+                                    Error
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse" id="pagesCollapseError" aria-labelledby="headingOne"
+                                    data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a class="nav-link" href="#">Link</a>
+                                    </nav>
+                                </div>
+                            </nav>
+                        </div>
+                        #}
+                        <div class="sb-sidenav-menu-heading">Seus Clientes</div>
+                        <a class="nav-link" href="{{ url_for('clients.main') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
+                            Lista de Clientes
+                        </a>
+                    <div class="sb-sidenav-menu-heading">Suas Vendas</div>
+                        <a class="nav-link" href="{{ url_for('sales.main') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
+                            Histórico de Vendas
+                        </a>
+                    </div> {# end of the navbar #}
+                </div>
+                <div class="sb-sidenav-footer">
+                    <div class="small">Logged in as:</div>
+                    Start Bootstrap
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                {% block content %}{% endblock %}
+            </main>
+            <footer></footer>
+        </div>
+        <!-- jQuery -->
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+        <!-- Bootstrap 5 -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
+            integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js"
+            integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj"
+            crossorigin="anonymous"></script>
+        <!-- DataTables -->
+        <script type="text/javascript" charset="utf8"
+            src="{{ url_for('static', filename='DataTables/datatables.js') }}"></script>
+        <script>
+            $(document).ready(function () {
+                $('#Clients').DataTable({
+                    language: {
+                        url: '{{ url_for("static", filename="localisation/pt-br.json") }}'
+                    }
+                });
+                $('#Products').DataTable({
+                    language: {
+                        url: '{{ url_for("static", filename="localisation/pt-br.json") }}'
+                    }
+                });
+                $('#Sales').DataTable({
+                    language: {
+                        url: '{{ url_for("static", filename="localisation/pt-br.json") }}'
+                    }
+                });
+                $('#datatablesSimple').DataTable({
+                    language: {
+                        url: '{{ url_for("static", filename="localisation/pt-br.json") }}'
+                    }
+                });
+                $('#Production').DataTable({
+                    language: {
+                        url: '{{ url_for("static", filename="localisation/pt-br.json") }}'
+                    }
+                });
             });
-            $('#Products').DataTable({
-                language: {
-                    url: '{{ url_for("static", filename="localisation/pt-br.json") }}'
-                }
-            });
-            $('#Sales').DataTable({
-                language: {
-                    url: '{{ url_for("static", filename="localisation/pt-br.json") }}'
-                }
-            });
-        });
+        </script>
+        <script src="{{ url_for('static', filename='js/dashboard/dashboard.js') }}"></script>
+        {% block script %}
 
-
-
-
-</script>
-<!-- JQuery Mask Plugin -->
-<script type="text/javascript"
-        src="{{ url_for('static', filename='jQuery-Mask-Plugin-master/src/jquery.mask.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='script/layout.js')}}"></script>
-
-{% block script %} {% endblock %}
+        {% endblock script %}
 </body>
-
-<footer class="float-bottom bg-green bg-gradient container text-light text-center fs-6 mb-4">
-    Created for CS50
-</footer>
-
-</html>

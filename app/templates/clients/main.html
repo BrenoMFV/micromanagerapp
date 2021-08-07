@@ -2,139 +2,149 @@
 {% from "helpers.html" import render_field %}
 
 {% block content %}
-<div class='page_header'>Lista de Clientes</div>
-<div class="row buttons_area">
-	<div class="col-sm-4" id="buttons">
-		<div class="card">
-			<div class="card-body ">
-				<h5 class="card-title">Cadastre seus Clientes</h5>
-				<p class="card-text">
-					<!-- Insira novos clientes na base de dados -->
-				</p>
-				<button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal"
-					data-bs-target="#registerClientModal">
-					Cadastrar Cliente
-				</button>
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-4">
-		<div class="card">
-			<div class="card-body">
-				<h5 class="card-title">Crie novas Categorias de Cliente</h5>
-				<p class="card-text">
-					<!-- Categorias são uma boa forma de organizar e compartimentar os seus
-					clientes para obter análise de dados mais relevante e possibilitar
-					que algumas funções melhorem sua produtividade no futuro. -->
-				</p>
-				<button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal"
-					data-bs-target="#registerClientCategoryModal">
-					Cadastrar Categoria
-				</button>
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-4">
-		<div class="card">
-			<div class="card-body">
-				<h5 class="card-title">Editar Categorias</h5>
-				<p class="card-text">
-				</p>
-				<button type="button" class="btn btn-green me-md-2" data-bs-toggle="modal"
-					data-bs-target="#editClientCategoryModal">
-					Editar Categoria
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="table-responsive-lg">
-	<table class='table table-hover table-striped table-bordered table-responsive-lg' id="Clients">
-		<thead>
-			<tr>
-				<th scope='col'>Cliente</th>
-				<th scope='col'>Contato</th>
-				<th scope='col'>Email</th>
-				<th scope='col'>Categoria</th>
-				<th scope='col'>Endereço</th>
-				<th scope='col'>Deletar</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for client in clients %}
-			{% set location = [client.address, client.city] %}
-			<tr>
-				<th scope="row">
-					<a href="#" onclick="get_client({{ client.client_id }}); return false;">
-						{{ client.name|escape }}
-					</a>
-				</th>
-				<td>
-					<a target="_blank" rel="noopener noreferrer"
-						href="https://web.whatsapp.com/send?phone='+55{{client.contact_number|escape}}">
-						{{ client.contact_number|escape }}</a>
-				</td>
-				<td>{{ client.email|escape }}</td>
-				<td>{{ client.category_name|escape|capitalize }}</td>
-				<td>
-					<a href="https://www.google.com/maps/?q={{ location|join(', ') }}">
-						{{ client.city|safe }}
-					</a>
-				</td>
-				<td>
-					<a href="{{ url_for('.delete', client_id=client.client_id) }}"
-						onclick="return confirm('Deletar esse cadastro não apagará as informações relacionadas,\ncomo o histórico de vendas ou suas transações.\n\nDeseja prosseguir?');">
-						Deletar
-					</a>
-				</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-</div>
+<div class="container">
+    <div class='page_header'>Lista de Clientes
+        <div class="row buttons_area">
+            <div class="col-sm-4" id="buttons">
+                <div class="card">
+                    <div class="card-body ">
+                        <h5 class="card-title">Cadastre seus Clientes</h5>
+                        <p class="card-text">
+                            <!-- Insira novos clientes na base de dados -->
+                        </p>
+                        <button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal"
+                                data-bs-target="#registerClientModal">
+                            Cadastrar Cliente
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Crie novas Categorias de Cliente</h5>
+                        <p class="card-text">
+                            <!-- Categorias são uma boa forma de organizar e compartimentar os seus
+                        clientes para obter análise de dados mais relevante e possibilitar
+                        que algumas funções melhorem sua produtividade no futuro. -->
+                        </p>
+                        <button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal"
+                                data-bs-target="#registerClientCategoryModal">
+                            Cadastrar Categoria
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Editar Categorias</h5>
+                        <p class="card-text">
+                        </p>
+                        <button type="button" class="btn btn-green me-md-2" data-bs-toggle="modal"
+                                data-bs-target="#editClientCategoryModal">
+                            Editar Categoria
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Seus Clientes
+        </div>
+        <div class="card-body">
+            <div class="table-responsive-lg">
+                <table class='table table-hover table-striped table-bordered table-responsive-lg' id="Clients">
+                    <thead>
+                    <tr>
+                        <th scope='col'>Cliente</th>
+                        <th scope='col'>Contato</th>
+                        <th scope='col'>Email</th>
+                        <th scope='col'>Categoria</th>
+                        <th scope='col'>Endereço</th>
+                        <th scope='col'>Deletar</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for client in clients %}
+                    {% set location = [client.address, client.city] %}
+                    <tr>
+                        <th scope="row">
+                            <a href="#" onclick="get_client({{ client.client_id }}); return false;">
+                                {{ client.name|escape }}
+                            </a>
+                        </th>
+                        <td>
+                            <a target="_blank" rel="noopener noreferrer"
+                               href="https://web.whatsapp.com/send?phone='+55{{client.contact_number|escape}}">
+                                {{ client.contact_number|escape }}</a>
+                        </td>
+                        <td>{{ client.email|escape }}</td>
+                        <td>{{ client.category_name|escape|capitalize }}</td>
+                        <td>
+                            <a href="https://www.google.com/maps/?q={{ location|join(', ') }}">
+                                {{ client.city|safe }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('.delete', client_id=client.client_id) }}"
+                               onclick="return confirm('Deletar esse cadastro não apagará as informações relacionadas,\ncomo o histórico de vendas ou suas transações.\n\nDeseja prosseguir?');">
+                                Deletar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+    </div>
+        {% include 'clients/edit_client_category_modal.html' %}
+        {% include 'clients/register_client_category_modal.html' %}
+        {% include 'clients/register_client_modal.html' %}
+        {% include 'clients/edit_client_modal.html' %}
 
+        {% endblock %}
 
-{% include 'clients/edit_client_category_modal.html' %}
-{% include 'clients/register_client_category_modal.html' %}
-{% include 'clients/register_client_modal.html' %}
-{% include 'clients/edit_client_modal.html' %}
-
-{% endblock %}
-
-{% block script %}
-<script>
+        {% block script %}
+        <script>
 	function get_client(id) {
-		data = {id: id}
+		data = { id: id }
 
 		$.ajax({
 			url: '{{ url_for(".client_profile") }}',
 			dataType: 'json',
 			method: "GET",
 			data: data,
-			success: function(response) {
+			success: function (response) {
 				$('#editClientModal').modal('show');
 
 				$("form#edit input[name='id']").val(response['id']);
 				$("form#edit input[name='name'").val(response['name']);
 
-				$("form#edit input[name='ddd']").val(response['ddd']); 
-				$("form#edit input[name='phonenumber']").val(response['phonenumber']); 
+				$("form#edit input[name='ddd']").val(response['ddd']);
+				$("form#edit input[name='phonenumber']").val(response['phonenumber']);
 
-				$("form#edit input[name='email']").val(response['email']); 
+				$("form#edit input[name='email']").val(response['email']);
 
-				$("form#edit input[name='address']").val(response['address']); 
+				$("form#edit input[name='address']").val(response['address']);
 				$("form#edit input[name='city']").val(response['city']);
 				$("form#edit select.edit_form option[value='" + response['state'] + "']").prop('selected', true);
 				$("form#edit input[name='observations']").val(response['observations']);
 
-				$("form#edit select.edit_form option[value='" + response['category_id'] +"']").prop('selected', true);
+				$("form#edit select.edit_form option[value='" + response['category_id'] + "']").prop('selected', true);
 				$("form#edit input[name='cpf']").val(response['cpf']);
 				$("form#edit input[name='cnpj']").val(response['cnpj']);
 			},
-			error: function(err) {
+			error: function (err) {
 				console.error(err);
 			}
 		});
 	}
-</script>
-{% endblock %}
+
+        </script>
+        {% endblock %}

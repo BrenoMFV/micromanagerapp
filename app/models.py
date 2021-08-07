@@ -8,7 +8,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login_manager
 from app.helpers import QueryWithSoftDelete, StrippedString
-
+from enum import Enum, auto
 
 units_default = ('kg', 'g', 'mg', 'l', 'ml', 'oz', 'unidade', 'pacote')
 
@@ -47,11 +47,11 @@ class User(UserMixin, db.Model):
     @property
     def password(self):
         raise AttributeError("Password is not a readable attribute.")
-    
+
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
-    
+
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
@@ -80,7 +80,7 @@ class User(UserMixin, db.Model):
     @staticmethod
     def reset_password(token, new_password):
         s = Serializer(current_app.config['SECRET_KEY'])
-        try: 
+        try:
             data = s.loads(token.encode('utf-8'))
         except:
             return False
@@ -120,7 +120,6 @@ class Client(db.Model):
     client_address = db.relationship('Address', backref='client', lazy='dynamic')
     client_sale_rl = db.relationship('Sale', backref='client_sale', lazy='dynamic')
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    
 
     def __repr__(self):
         return '<Client: {}>'.format(self.name)
@@ -146,7 +145,7 @@ class ClientCategory(db.Model):
 
     category_id = db.Column(db.Integer, primary_key=True)
     category_name = db.Column(db.String(32), nullable=False, index=True)
-    category_price_rl = db.relationship('Price', backref='category_id') 
+    category_price_rl = db.relationship('Price', backref='category_id')
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     def __repr__(self):
@@ -184,9 +183,9 @@ class Price(db.Model):
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     def __repr__(self):
-        return '<Product_ID: {}, Clients Category: {} Price: R$ {}>'\
-            .format(self.product_id_fk, 
-                    self.category_id_fk, 
+        return '<Product_ID: {}, Clients Category: {} Price: R$ {}>' \
+            .format(self.product_id_fk,
+                    self.category_id_fk,
                     self.price)
 
 
@@ -247,12 +246,12 @@ class Production(db.Model):
         week = str(datetime.date(datetime.today()).isocalendar()[1])
         year = str(datetime.date(datetime.today()).isocalendar()[0])[2:]
         second = datetime.time(datetime.now()).strftime("%S")
-        self._batch = "0" + product_id + week + year + second 
+        self._batch = "0" + product_id + week + year + second
 
     def __repr__(self):
         return '<Product: {} | Amount Produced: {} | Date: {}>'.format(
-            self.product_id_fk, 
-            self.amount_produced, 
+            self.product_id_fk,
+            self.amount_produced,
             self.production_date
         )
 
@@ -261,7 +260,7 @@ class Payment(db.Model):
     __tablename__ = 'payments'
     # ????
     payment_id = db.Column(db.Integer, primary_key=True)
-    value = db.Column(db.Float(precision=2), nullable = False, index=True)
+    value = db.Column(db.Float(precision=2), nullable=False, index=True)
     date = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
@@ -274,7 +273,7 @@ class Sale(db.Model):
 
     sale_id = db.Column(db.Integer, primary_key=True)
     client_id_fk = db.Column(db.Integer, db.ForeignKey('clients.client_id'), index=True)
-    total_value = db.Column(db.Float(precision=2), nullable = False)
+    total_value = db.Column(db.Float(precision=2), nullable=False)
     date = db.Column(db.Date, nullable=False, default=datetime.today(), index=True)
     delivery_date = db.Column(db.Date)
     due = db.Column(db.Boolean, default=False)
@@ -289,7 +288,7 @@ class PartialSale(db.Model):
     partial_sale_id = db.Column(db.Integer, primary_key=True)
     product_id_fk = db.Column(db.Integer, db.ForeignKey('products.product_id'), nullable=False)
     product_amount = db.Column(db.Float(precision=2), nullable=False)
-    price = db.Column(db.Float(precision=2), nullable = False)
+    price = db.Column(db.Float(precision=2), nullable=False)
     partial_total = db.Column(db.Float(precision=2))
     sale_id_fk = db.Column(db.Integer, db.ForeignKey('sales.sale_id'), nullable=False)
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
@@ -303,7 +302,7 @@ class PartialSale(db.Model):
 
 class Recipe(db.Model):
     __tablename__ = "recipes"
-    
+
     recipe_id = db.Column(db.Integer, primary_key=True)
     product_id_fk = db.Column(db.Integer, db.ForeignKey('products.product_id'), index=True)
     recipe_name = db.Column(db.String(64), nullable=False, index=True)
@@ -318,19 +317,19 @@ class Recipe(db.Model):
 
 class Ingredient(db.Model):
     __tablename__ = 'ingredients'
-    
+
     ingredient_id = db.Column(db.Integer, primary_key=True, index=True)
     ingredient_name = db.Column(StrippedString(64), nullable=False, index=True)
     recipe_reference = db.Column(db.Boolean, default=False, nullable=False)
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    
+
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.ingredient_name)
 
 
 class Measurement(db.Model):
     __tablename__ = 'measurements'
-    
+
     measurement_id = db.Column(db.Integer, primary_key=True)
     measurement_name = db.Column(StrippedString, nullable=False, index=True)
     quantity_measurement = db.relationship('Quantity', backref="ingredient_measurement")
@@ -346,13 +345,13 @@ class Quantity(db.Model):
     quantity_id = db.Column(db.Integer, primary_key=True)
     ingredient_id_fk = db.Column(db.Integer, db.ForeignKey('ingredients.ingredient_id'))
     measurement_id_fk = db.Column(db.Integer, db.ForeignKey('measurements.measurement_id'))
-    ingredient_quantity = db.Column(db.Float(precision=2), nullable = False, index=True)
+    ingredient_quantity = db.Column(db.Float(precision=2), nullable=False, index=True)
     production_time = db.Column(db.Float(precision=2), index=True)
     recipe_id_fk = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'))
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    
+
     def __repr__(self):
-        return "<Ingrediente ID: {} | Receita ID: {} | Quantidade: {}>"\
+        return "<Ingrediente ID: {} | Receita ID: {} | Quantidade: {}>" \
             .format(self.ingredient_id_fk, self.recipe_id_fk, self.ingredient_quantity)
 
 
@@ -367,6 +366,7 @@ class RecipeStep(db.Model):
 
     def __repr__(self):
         return "<Step: {}; Step description: {} >".format(self.step_number, self.step_description)
+
 
 ####################################
 

@@ -15,6 +15,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
+
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -50,5 +51,5 @@ def create_app(config_name):
 
     from .account import account as account_blueprint
     app.register_blueprint(account_blueprint, url_prefix='/account')
-    
+
     return app

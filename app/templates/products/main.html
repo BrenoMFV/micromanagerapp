@@ -2,7 +2,7 @@
 {% from 'helpers.html' import render_field %}
 {% block content %}
 <div class="container">
-    <div class="page_header">
+    <div class="page-header">
         Produtos
     </div>
     <!-- works until 575x740px -->
@@ -26,7 +26,7 @@
                         clientes para obter análise de dados mais relevante e possibilitar
                         que algumas funções melhorem sua produtividade no futuro. -->
                     </p>
-                    <button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal"
+                    <button type="button" class="btn btn-danger me-md-2" data-bs-toggle="modal"
                         data-bs-target="#registerProductCategoryModal">
                         Cadastre <b>Novas Categorias</b> de Produto
                     </button>
@@ -41,7 +41,7 @@
                     </h5>
                     <p class="card-text">
                     </p>
-                    <button type="button" class="btn btn-red me-md-2" data-bs-toggle="modal"
+                    <button type="button" class="btn btn-danger me-md-2" data-bs-toggle="modal"
                         data-bs-target="#registerProductModal">
                         Cadastrar <b>Produtos</b>
                     </button>
@@ -55,36 +55,19 @@
                     </h5>
                     <p class="card-text">
                     </p>
-                    <button type="button" class="btn btn-green me-md-2" data-bs-toggle="modal"
+                    <button type="button" class="btn btn-success me-md-2" data-bs-toggle="modal"
                         data-bs-target="#registerProductionModal">
                         Registre sua <b>Produção</b>
                     </button>
                 </div>
             </div>
         </div>
-        <div class="col-md-3" id="buttons">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"></h5>
-                    <p class="card-text">
-                        <!-- Insira novos clientes na base de dados -->
-                    </p>
-                    <button link="{{ url_for('.production_record') }}" type="button" class="btn btn-blue me-md-2">
-                        <a style="text-decoration: none; color: white !important;" href="{{ url_for('.production_record') }}">
-                            Histórico de <b>Produção</b>
-                        </a>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row buttons_area">
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">
                     </h5>
-                    <button type="button" class="btn btn-green me-md-2" data-bs-toggle="modal"
+                    <button type="button" class="btn btn-success me-md-2" data-bs-toggle="modal"
                         data-bs-target="#editProductCategoryModal">
                         Editar <b>Categorias</b> de Produtos
                     </button>

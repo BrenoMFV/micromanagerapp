@@ -8,7 +8,7 @@ from flask_script import Manager
 from dotenv import load_dotenv
 
 from app import create_app, db
-from app.helpers import brl, phone_number, date_brz
+from app.helpers import CustomJinjaFilters
 from app.clients.forms import RegisterClientForm
 from app.models import (User, Client, ClientCategory, Ingredient, Product, ProductCategory,
                         Production, Sale, Supplier, User, Recipe, RecipeStep,
@@ -21,10 +21,10 @@ config_name = os.getenv('FLASK_CONFIG') or 'default'
 app = create_app(config_name)
 migrate = Migrate(app, db)
 
-jinja2.filters.FILTERS["PHONE"] = phone_number
-jinja2.filters.FILTERS["BRL"] = brl
+jinja2.filters.FILTERS["PHONE"] = CustomJinjaFilters.phone_number
+jinja2.filters.FILTERS["BRL"] = CustomJinjaFilters.brl
 jinja2.filters.FILTERS['dir'] = dir
-jinja2.filters.FILTERS['DATEBR'] = date_brz
+jinja2.filters.FILTERS['DATEBR'] = CustomJinjaFilters.date_brz
 
 
 @app.shell_context_processor

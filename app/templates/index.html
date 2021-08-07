@@ -1,145 +1,208 @@
 {% extends 'layout.html' %}
 {% from 'helpers.html' import render_field %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth_form.css') }}"> {% endblock head %} {% block
-content %} {% if current_user.is_authenticated %}
-<div class="page_header">
-    Visão geral
-    <p>
-    <div class="row dashboard">
-        <div class="col-md-4">
-            <div class="card dashboard_card" id='finance_dash'>
-                <div class="card-body">
-                    <div class="card-title">
-                        Faturamento
-                        <hr>
-                    </div>
-                    <p class="card-text">
-                        Hoje: {{ income['today'] | BRL }} <br>
-                        Semanal: {{ income['week'] | BRL }} <br>
-                        Mensal: {{ income['month'] | BRL }} <br>
-                    </p>
+{% endblock head %}
+{% block content %}
+{% if current_user.is_authenticated %}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Painel</h1>
+    {# Emergency
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Urgências</li>
+    </ol>
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-header"></div>
+                <div class="card-body">Primary Card</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card dashboard_card" id='production_dash'>
-                <div class="card-body">
-                    <div class="card-title">
-                        Produção
-                        <hr>
-                    </div>
-                    <p class="card-text dashboard">
-                        Última Produção:<br>
-                        <span class="production-item">
-                            {% if last_production %}
-                            <div class="table-responsive-lg">
-                                <table class="table" style="font-size: 13px; text-align: left;">
-                                    <thead>
-                                        <tr>
-                                            <th>Produto</th>
-                                            <th>Quantidade</th>
-                                            <th>Data</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>{{ last_production.product_name }}</td>
-                                            <td>{{ last_production.amount_produced }}</td>
-                                            <td>{{ last_production.production_date | DATEBR }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% else %}
-                            -
-                            {% endif %}
-                        </span>
-                    </p>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">Warning Card</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card dashboard_card" id='sales_dash'>
-                <div class="card-body">
-                    <div class="card-title">
-                        Vendas
-                        <hr>
-                    </div>
-                    Última venda:
-                    {% if last_sale %}
-                    <ul>
-                        <li style="font-size: 13px; text-align: left;">{{ last_sale.date | DATEBR }}
-                            -
-                            {{ last_sale.name }}
-                            -
-                            {{ last_sale.total_value |BRL }}
-                        </li>
-                    </ul>
-                    {% else %}
-                    -
-                    {% endif %}
-                    <br>
-                    Próxima entrega:
-                    {% if next_delivery %}
-                    <ul>
-                        <li style="font-size: 13px; text-align: left;">
-                            {{ next_delivery.delivery_date | DATEBR }}
-                            : {{ next_delivery_count }} cliente{% if next_delivery_count > 1%}s{%endif%}.
-                        </li>
-                    </ul>
-                    {% else %}
-                    -
-                    {% endif %}
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">Success Card</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-header">Baixo Estoque</div>
+                <div class="card-body">Estoque baixo</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div class="row dashboard">
-    <div class="col-md-4">
-        <div class="card dashboard_card" id='products_dash'>
-            <div class="card-body">
-                <div class="card-title">
-                    Produtos
-                    <hr>
+    #}
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-area me-1"></i>
+                    Vendas da Semana
                 </div>
-                <p class="card-text">
-                    Produtos Cadastrados: {{ product_count }}<br>
-                    Com Estoque baixo: {{ stock_alert_count }}<br>
-                </p>
+                <div class="card-body"><canvas id="financeChart" width="100%" height="40"></canvas></div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Bar Chart Example
+                </div>
+                <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card dashboard_card" id='clients_dash'>
-            <div class="card-body">
-                <div class="card-title">
-                    Clientes
-                    <hr>
-                </div>
-                <p class="card-text dashboard">
-                    Clientes Cadastrados: {{ client_count }}</p>
-            </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Pedidos Recentes
+        </div>
+        <div class="card-body">
+            <table id="datatablesSimple">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Position</th>
+                        <th>Office</th>
+                        <th>Age</th>
+                        <th>Start date</th>
+                        <th>Salary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Teste</td>
+                        <td>Teste</td>
+                        <td>Teste</td>
+                        <td>Teste</td>
+                        <td>Teste</td>
+                        <td>Teste</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
-</div>
-{% else %}
-<div class="container-md text-center pt-3">
-        <h3>Você está acessando o KitchenApp,</h3><br>
-        <h4>o mais novo aplicativo de controle de estoque, vendas e produção para o seu negócio.</h4><br>
-        <h5>se deseja uma conta experimentar gratuitamente a ferramenta, entre em contato com kitchenapp.admin@gmail.com.<br>
-        Se já possuir cadastro, clique abaixo para fazer login,<br>
-    e muito obrigado pela preferência!</h5><br>
-    <button type="button" class="btn btn-green">
-        <a href="{{ url_for('auth.login') }}" style="text-decoration: none; color: black;">
-            Login
-        </a>
-    </button>
+    <footer class="py-4 bg-light mt-auto">
+        <div class="container-fluid px-4">
+            <div class="d-flex align-items-center justify-content-between small">
+                <div class="text-muted">Copyright &copy; Your Website 2021</div>
+                <div>
+                    <a href="#">Privacy Policy</a>
+                    &middot;
+                    <a href="#">Terms &amp; Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>
 
-</div>
-<!-- /form -->
-{% endif %} {% endblock %} {% block script %}
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/assets/demo/chart-area-demo.js') }}"></script>
+<script src="{{ url_for('static', filename='js/assets/demo/chart-bar-demo.js') }}"></script>
+<script type="text/javascript">
+    // Set new default font family and font color to mimic Bootstrap's default styling
+    Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+    Chart.defaults.global.defaultFontColor = '#292b2c';
+
+    // Area Chart Example
+    var ctx = document.getElementById("financeChart");
+    var myLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["Seg {{ weekdays[0] }}", "Ter {{ weekdays[1] }}", "Qua {{ weekdays[2] }}",
+                "Qui {{ weekdays[3] }}", "Sex {{ weekdays[4] }}", "Sáb {{ weekdays[5] }}",
+                "Dom {{ weekdays[6] }}"],
+            datasets: [{
+                label: "Valor",
+                lineTension: 0.2,
+                backgroundColor: "rgba(2,117,216,0.2)",
+                borderColor: "rgba(2,117,216,1)",
+                pointRadius: 5,
+                pointBackgroundColor: "rgba(2,117,216,1)",
+                pointBorderColor: "rgba(255,255,255,0.8)",
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(2,117,216,1)",
+                pointHitRadius: 50,
+                pointBorderWidth: 1,
+                data: [{% for weekday in weekdays %}
+                            {% if data['sales_per_day'][weekday] %}
+                                {{ data['sales_per_day'][weekday][0] }},
+                            {% else %}
+                                {{ 0 }},
+                            {% endif %}
+                        {% endfor %}
+                ],
+            }],
+        },
+    options: {
+        scales: {
+            xAxes: [{
+                time: {
+                    unit: 'date'
+                },
+                gridLines: {
+                    display: true
+                },
+                ticks: {
+                    maxTicksLimit: 7
+                }
+            }],
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 10,
+                        maxTicksLimit: 5
+                    },
+                    gridLines: {
+                        color: "rgba(0, 0, 0, .125)",
+                    }
+                }],
+            },
+        legend: {
+            display: false
+        }
+    }
+    });
+</script>
 {% endblock script %}
+{% else %}
+<div class="container">
+    <div class="text-center pt-3">
+        <h3>Você está acessando o KitchenApp,</h3><br>
+        <h4>o mais novo aplicativo de controle de estoque, vendas e produção para o seu negócio.</h4><br>
+        <h5>se deseja uma conta experimentar gratuitamente a ferramenta, entre em contato com
+            kitchenapp.admin@gmail.com.<br>
+            Se já possuir cadastro, clique abaixo para fazer login,<br>
+            e muito obrigado pela preferência!</h5><br>
+        <button type="button" class="btn btn-green">
+            <a href="{{ url_for('auth.login') }}" style="text-decoration: none; color: black;">
+                Login
+            </a>
+        </button>
+    </div>
+</div>
+
+<!-- /form -->
+{% endif %}
+{% endblock %}
