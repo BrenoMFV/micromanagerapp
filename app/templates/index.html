@@ -82,22 +82,28 @@
                 <thead>
                     <tr>
                         <th>Cliente</th>
-                        <th>Position</th>
-                        <th>Office</th>
-                        <th>Age</th>
-                        <th>Start date</th>
-                        <th>Salary</th>
+                        <th>Categoria</th>
+                        <th>Produtos</th>
+                        <th>Valor</th>
+                        <th>Local de Entrega</th>
+                        <th>Data</th>
                     </tr>
                 </thead>
                 <tbody>
+                {% if recent_sales %}
+                    {% for sale in recent_sales %}
                     <tr>
-                        <td>Teste</td>
-                        <td>Teste</td>
-                        <td>Teste</td>
-                        <td>Teste</td>
-                        <td>Teste</td>
-                        <td>Teste</td>
+                        <th scope="row">{{ sale.name}}</th>
+                        <td scope="row">{{ sale.}}</td>
+                        <td scope="row">{{ sale.}}</td>
+                        <td scope="row">{{ sale.}}</td>
+                        <td scope="row">{{ sale.}}</td>
+                        <td scope="row">{{ sale.}}</td>
                     </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><th colspan="6">Você não possui vendas registradas nas últimas duas semanas.</th></tr>
+                {% endif %}
                 </tbody>
             </table>
         </div>

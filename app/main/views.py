@@ -5,7 +5,6 @@ from markupsafe import Markup
 from datetime import date, timedelta
 import pprint
 
-
 from .. import db
 from ..auth.forms import LoginForm, PasswordResetStep1Form, RegisterUserForm
 from ..models import Client, Product, User, Production, Sale, Unit, units_default
@@ -29,12 +28,12 @@ def index():
     loginForm = LoginForm()
     passwordResetStep1Form = PasswordResetStep1Form()
     if current_user.is_authenticated:
-    
+
         data = dict()
         # get current amount of clients registered
         data['client_count'] = Client.query.options(db.load_only('name')).filter_by(
             user_id_fk=current_user.get_id()).count()
-        
+
         # last production registered
         data['last_production'] = Production.query.join(Product, Product.product_id == Production.product_id_fk) \
             .add_columns(
@@ -44,11 +43,11 @@ def index():
         ) \
             .filter(Production.user_id_fk == current_user.user_id) \
             .order_by(Production.production_date.asc()).first()
-        
+
         # counting products registered
         data['product_count'] = Product.query.options(db.load_only('product_id')).filter_by(
             user_id_fk=current_user.user_id).count()
-        
+
         # sends an alert if a product stock is lower than it should be 
         data['stock_alert_count'] = 0
         if data['product_count'] > 0:
@@ -56,18 +55,22 @@ def index():
                     user_id_fk=current_user.user_id).all():
                 if product.amount <= product.stock_alert:
                     data['stock_alert_count'] += 1
-        
+
         # last sale made
-        data['last_sale'] = Sale.query.join(Client, Sale.client_id_fk == Client.client_id) \
+        data['last_sales'] = Sale.query.join(Client, Sale.client_id_fk == Client.client_id) \
             .add_columns(
+            Sale.sale_id,
             Client.name,
             Sale.total_value,
-            Sale.sale_id,
-            Sale.date
+            Sale.date,
+            Sale.delivery_date,
+
         ) \
-            .filter(Sale.user_id_fk == current_user.user_id) \
-            .order_by(Sale.date.desc()).first()
-        
+            .filter(db.and_(Sale.user_id_fk == current_user.user_id,
+                            Sale.date >= (datetime.date.today() - datetime.timedelta(15)))) \
+            .limit(10) \
+            .order_by(Sale.date.desc())
+
         # next delivery to be made
         data['next_delivery'] = Sale.query.join(Client, Sale.client_id_fk == Client.client_id) \
             .add_columns(
@@ -83,16 +86,15 @@ def index():
             data['next_delivery_count'] = Sale.query.filter_by(
                 delivery_date=data['next_delivery'].delivery_date).count()
 
-        
         data['periodic_income'] = dict()
         periodic_income_today = [sale.total_value for sale in
-                        Sale.query.filter(Sale.date >= (date.today() - timedelta(7))).all()]
+                                 Sale.query.filter(Sale.date >= (date.today() - timedelta(7))).all()]
         data['periodic_income']['today'] = sum(periodic_income_today)
         periodic_income_week = [sale.total_value for sale in
-                       Sale.query.filter(Sale.date >= (date.today() - timedelta(weeks=1))).all()]
+                                Sale.query.filter(Sale.date >= (date.today() - timedelta(weeks=1))).all()]
         data['periodic_income']['week'] = sum(periodic_income_week)
         periodic_income_month = [sale.total_value for sale in
-                        Sale.query.filter(Sale.date >= (date.today() - timedelta(30))).all()]
+                                 Sale.query.filter(Sale.date >= (date.today() - timedelta(30))).all()]
         data['periodic_income']['month'] = sum(periodic_income_month)
 
         # count of sales made by day
@@ -106,11 +108,11 @@ def index():
         # the week starting by monday, thus the reverse range() use
         today = date.weekday(date.today())
         for day in range(today, -1, -1):
-            
+
             # gets the monday's date
             date_query = date.today() - timedelta(day)
             query = Sale.query.filter_by(user_id_fk=current_user.user_id, date=date_query)
-            
+
             # gets the total value sold that day
             total_daily_income_value = list()
             if query.count():
@@ -118,15 +120,13 @@ def index():
 
             # uṕdate the value in the already made list
             data['sales_per_day'][weekdays[day]] = (query.count(), sum(total_daily_income_value))
-            
 
         pprint.pprint(data)
-        return render_template('index.html', 
+        return render_template('index.html',
                                data=data,
                                weekdays=weekdays
                                )
     return render_template('index.html')
-
 
 #  {'client_count': 1,
 #  'last_production': None,
