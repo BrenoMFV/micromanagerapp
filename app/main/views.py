@@ -1,15 +1,14 @@
-from flask import Flask, current_app, flash, redirect, render_template, session, url_for
-from flask_login import current_user, login_required
-from flask_sqlalchemy import get_debug_queries
-from markupsafe import Markup
-from datetime import date, timedelta
 import pprint
+from datetime import date, timedelta, datetime
 
-from .. import db
-from ..auth.forms import LoginForm, PasswordResetStep1Form, RegisterUserForm
-from ..models import Client, Product, User, Production, Sale, Unit, units_default
+from flask import render_template
+from flask_login import current_user
+
 from . import main
-from ..helpers import get_current_monday, get_week_days
+from .. import db
+from ..auth.forms import LoginForm, PasswordResetStep1Form
+from ..helpers import get_week_days
+from ..models import Client, Product, Production, Sale
 
 
 # @main.after_app_request
@@ -57,20 +56,12 @@ def index():
                     data['stock_alert_count'] += 1
 
         # last sale made
-        data['last_sales'] = Sale.query.join(Client, Sale.client_id_fk == Client.client_id) \
-            .add_columns(
-            Sale.sale_id,
-            Client.name,
-            Sale.total_value,
-            Sale.date,
-            Sale.delivery_date,
-
-        ) \
+        data['recent_sales'] = Sale.query.join(Client, Sale.client_id_fk == Client.client_id) \
             .filter(db.and_(Sale.user_id_fk == current_user.user_id,
-                            Sale.date >= (datetime.date.today() - datetime.timedelta(15)))) \
+                            Sale.date >= (date.today() - timedelta(15)))) \
+            .order_by(Sale.date.desc()) \
             .limit(10) \
-            .order_by(Sale.date.desc())
-
+ \
         # next delivery to be made
         data['next_delivery'] = Sale.query.join(Client, Sale.client_id_fk == Client.client_id) \
             .add_columns(

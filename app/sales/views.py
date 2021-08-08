@@ -6,7 +6,7 @@ from markupsafe import Markup
 
 from .. import db
 from ..models import (Client, Address, Sale, PartialSale,
-                      Price, Product, Production, Recipe, User, Utilities,)
+                      Price, Product, Production, User, Utilities)
 from . import sales
 from .forms import RegisterSaleForm, PdfForm
 

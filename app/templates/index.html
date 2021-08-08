@@ -83,22 +83,23 @@
                     <tr>
                         <th>Cliente</th>
                         <th>Categoria</th>
-                        <th>Produtos</th>
                         <th>Valor</th>
                         <th>Local de Entrega</th>
                         <th>Data</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                {% if recent_sales %}
-                    {% for sale in recent_sales %}
+                {% if data['recent_sales'] %}
+                    {% for sale in data['recent_sales'] %}
                     <tr>
                         <th scope="row">{{ sale.name}}</th>
-                        <td scope="row">{{ sale.}}</td>
-                        <td scope="row">{{ sale.}}</td>
-                        <td scope="row">{{ sale.}}</td>
-                        <td scope="row">{{ sale.}}</td>
-                        <td scope="row">{{ sale.}}</td>
+                        <td scope="row">{{ sale.client.name }}</td>
+                        <td scope="row">{{ sale.date }}</td>
+                        <td scope="row">{{ sale.total_value }}</td>
+                        <td scope="row">{{ sale.client.address.street }}</td>
+                        <td scope="row">{{ sale.delivery_date }}</td>
+                        <td scope="row"><a href="#"></a>Ver mais</td>
                     </tr>
                     {% endfor %}
                 {% else %}

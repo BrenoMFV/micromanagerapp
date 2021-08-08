@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import current_app, flash
 from flask_login import UserMixin
 from flask_login._compat import text_type
+from sqlalchemy.dialects.postgresql import UUID
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -21,7 +22,7 @@ def load_user(user_id):
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
-    user_id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(StrippedString(32), nullable=False)
     last_name = db.Column(StrippedString(64), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
@@ -32,14 +33,15 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime, default=datetime.utcnow)
     confirmed = db.Column(db.Boolean, default=False)
 
-    # relationships with other tables
+    # relationships with other tables, most all are one-to-many
     clients = db.relationship('Client', back_populates='user')
-    client_categories = db.relationship('ClientCategory', back_populates='user')
+    clients_categories = db.relationship('ClientCategory', back_populates='user')
     products = db.relationship('Product', back_populates='user')
-    stock = db.relationship('Production', back_populates='user')
-    prices = db.relationship('Price', back_populates='user')
+    stock = db.relationship('Production', backref='user')
+    prices = db.relationship('Price', backref='user')
     partial_sales = db.relationship('PartialSale', back_populates="user")
     sales = db.relationship('Sale', back_populates='user')
+
     # not yet implemented
     # recipes = db.relationship('Recipe', backref='user')
     # recipe_steps = db.relationship('RecipeStep', back_populates='user')
@@ -109,7 +111,7 @@ class Client(db.Model):
 
     query_class = QueryWithSoftDelete
 
-    client_id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+    client_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
     name = db.Column(StrippedString(32), nullable=False, index=True)
     email = db.Column(StrippedString(64), index=True)
     ddd = db.Column(db.String(4))
@@ -119,8 +121,9 @@ class Client(db.Model):
     added = db.Column(db.DateTime, default=datetime.utcnow)
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     category_id_fk = db.Column(db.Integer, db.ForeignKey('clients_categories.category_id'))
-    addresses = db.relationship('Address', back_populates='client', lazy='dynamic')
-    purchases = db.relationship('Sale', back_populates='client', lazy='dynamic')
+    user = db.relationship('User', back_populates='clients')
+    addresses = db.relationship('Address', backref='client', lazy='dynamic')
+    purchases = db.relationship('Sale', backref='client', lazy='dynamic')
 
     deleted = db.Column(db.Boolean(), default=False)
 
@@ -136,7 +139,7 @@ class Address(db.Model):
     city = db.Column(db.String(32))
     state = db.Column(db.String(2))
     observations = db.Column(db.String(128))
-    client_id_fk = db.Column(db.Integer, db.ForeignKey('clients.client_id'))
+    client_id_fk = db.Column(UUID(as_uuid=True), db.ForeignKey('clients.client_id'))
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     def __repr__(self):
@@ -148,8 +151,9 @@ class ClientCategory(db.Model):
 
     category_id = db.Column(db.Integer, primary_key=True)
     category_name = db.Column(db.String(32), nullable=False, index=True)
-    clients = db.relationship("Client", back_populates='category')
-    products_prices = db.relationship('Price', back_populates='category')
+    clients = db.relationship("Client", backref='category')
+    products_prices = db.relationship('Price', backref='category')
+    user = db.relationship('User', back_populates='clients_categories')
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     def __repr__(self):
@@ -161,16 +165,17 @@ class Product(db.Model):
 
     query_class = QueryWithSoftDelete
 
-    product_id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+    product_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
     product_name = db.Column(StrippedString(64), nullable=False, index=True)
     product_category_fk = db.Column(db.Integer, db.ForeignKey('products_categories.category_id'), nullable=False)
     amount = db.Column(db.Float(precision=2), nullable=False, default=0.00)
     stock_alert = db.Column(db.Float(precision=2), default=0.00)
-    unit = db.Column(db.Integer, db.ForeignKey('units.unit_id'))
+    unit_id_fk = db.Column(db.Integer, db.ForeignKey('units.unit_id'))
     productions = db.relationship('Production', back_populates="product")
     prices = db.relationship('Price', back_populates='product')
     partial_sales = db.relationship('PartialSale', back_populates='product')
-    recipes = db.relationship('Recipe', back_populates='product')
+    # recipes = db.relationship('Recipe', back_populates='product')
+    user = db.relationship("User", back_populates='products')
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     deleted = db.Column(db.Boolean(), default=False)
@@ -179,13 +184,14 @@ class Product(db.Model):
         return '<{}: {}>'.format(self.__class__.__name__, self.product_id)
 
 
-class PricePerCategory(db.Model):
+class Price(db.Model):
     __tablename__ = 'prices'
 
     price_id = db.Column(db.Integer, primary_key=True)
     price = db.Column(db.Float(precision=2), nullable=False)
-    product_id_fk = db.Column(db.Integer, db.ForeignKey('products.product_id'))
+    product_id_fk = db.Column(UUID(as_uuid=True), db.ForeignKey('products.product_id'))
     category_id_fk = db.Column(db.Integer, db.ForeignKey('clients_categories.category_id'))
+    product = db.relationship('Product', back_populates='prices')
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     def __repr__(self):
@@ -200,7 +206,7 @@ class Unit(db.Model):
 
     unit_id = db.Column(db.Integer, primary_key=True)
     unit = db.Column(db.String)
-    product = db.relationship('Product', back_populates='unit')
+    product = db.relationship('Product', backref='unit')
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     def __repr__(self):
@@ -223,10 +229,11 @@ class Production(db.Model):
     __tablename__ = 'productions'
 
     production_id = db.Column(db.Integer, primary_key=True)
-    product_id_fk = db.Column(db.Integer, db.ForeignKey('products.product_id'), index=True)
+    product_id_fk = db.Column(UUID(as_uuid=True), db.ForeignKey('products.product_id'), index=True)
     amount_produced = db.Column(db.Integer, nullable=False)
     production_date = db.Column(db.Date, nullable=False)
     expiration_date = db.Column(db.Date)
+    product = db.relationship('Product', back_populates='productions')
     _batch = db.Column(db.String())
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
@@ -236,17 +243,17 @@ class Production(db.Model):
 
     @batch.setter
     def batch(self, product_id):
-        product_id = str("0" + product_id) if product_id < 10 else product_id
+        product_id = str("00" + product_id) if product_id < 100 else str("0" + product_id)
         week = str(datetime.date(datetime.today()).isocalendar()[1])
         year = str(datetime.date(datetime.today()).isocalendar()[0])[2:]
         second = datetime.time(datetime.now()).strftime("%S")
-        self._batch = product_id + week + year + second
+        self._batch = f'{product_id}{week}{year}{second}'
 
     def __repr__(self):
-        return '<Product: {} | Amount Produced: {} | Date: {}>'.format(
-            self.product_id_fk,
+        return '<{} of {} in the day {}>'.format(
             self.amount_produced,
-            self.production_date
+            self.product_id_fk,
+            self.production_date.strftime('%d:%m:%Y')
         )
 
 
@@ -280,7 +287,7 @@ class PaymentMethod(db.Model):
 
     method_id = db.Column(db.Integer, primary_key=True)
     method = db.Column(db.String(32))
-    payments = db.relationship('Sale', back_populates='payment_method')
+    payments = db.relationship('Sale', backref='payment_method')
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.method)
@@ -289,26 +296,29 @@ class PaymentMethod(db.Model):
 class Sale(db.Model):
     __tablename__ = "sales"
 
-    sale_id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    client_id_fk = db.Column(db.Integer, db.ForeignKey('clients.client_id'), index=True)
+    sale_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+    client_id_fk = db.Column(UUID(as_uuid=True), db.ForeignKey('clients.client_id'), index=True)
     total_value = db.Column(db.Float(precision=2), nullable=False)
     date = db.Column(db.Date, nullable=False, default=datetime.today(), index=True)
     delivery_date = db.Column(db.Date)
     due = db.Column(db.Boolean, default=False)
-    payment_method = db.Column(db.Integer, db.ForeignKey('payment_methods.method_id'))
+    payment_method_id_fk = db.Column(db.Integer, db.ForeignKey('payment_methods.method_id'))
     partial_sales = db.relationship('PartialSale', backref="sale", cascade="all, delete-orphan")
+    user = db.relationship('User', back_populates='sales')
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
 
 class PartialSale(db.Model):
     __tablename__ = "partial_sales"
 
-    partial_sale_id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    product_id_fk = db.Column(db.Integer, db.ForeignKey('products.product_id'), nullable=False)
+    partial_sale_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+    product_id_fk = db.Column(UUID(as_uuid=True), db.ForeignKey('products.product_id'), nullable=False)
     product_amount = db.Column(db.Float(precision=2), nullable=False)
     price = db.Column(db.Float(precision=2), nullable=False)
     partial_total = db.Column(db.Float(precision=2))
-    sale_id_fk = db.Column(db.Integer, db.ForeignKey('sales.sale_id'), nullable=False)
+    user = db.relationship('User', back_populates='partial_sales')
+    sale_id_fk = db.Column(UUID(as_uuid=True), db.ForeignKey('sales.sale_id'), nullable=False)
+    product = db.relationship('Product', back_populates='partial_sales')
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
     def __repr__(self):
@@ -323,7 +333,7 @@ class PartialSale(db.Model):
 #     __tablename__ = "recipes"
 #
 #     recipe_id = db.Column(db.Integer, primary_key=True)
-#     product_id_fk = db.Column(db.Integer, db.ForeignKey('products.product_id'), index=True)
+#     product_id_fk = db.Column(UUID(as_uuid=True), db.ForeignKey('products.product_id'), index=True)
 #     recipe_name = db.Column(db.String(64), nullable=False, index=True)
 #     recipe_description = db.Column(db.String)
 #     production_time = db.Column(db.Float(precision=2), index=True)
@@ -341,7 +351,7 @@ class PartialSale(db.Model):
 #     recipe_id_fk = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'))
 #     step_number = db.Column(db.Integer, nullable=False)
 #     step_description = db.Column(db.String, nullable=False)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+#     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('user.user_id'))
 #     recipe = db.relationship('Recipe', back_populates='recipe')
 #
 #     def __repr__(self):

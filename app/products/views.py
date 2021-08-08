@@ -5,7 +5,7 @@ from datetime import date
 
 from ..helpers import CommaDecimalField
 from .. import db
-from ..models import (Price, Unit, Payment, Product, ProductCategory, ClientCategory, Production, Recipe,
+from ..models import (Price, Unit, Product, ProductCategory, ClientCategory, Production,
                       Sale, PartialSale, User, Utilities, units_default)
 from . import products
 from .forms import (RegisterProductCategoryForm, RegisterProductForm,

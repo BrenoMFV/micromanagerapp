@@ -9,7 +9,7 @@ from flask_mail import Mail
 from config import config
 
 mail = Mail()
-migrate = Migrate()
+migrate = Migrate(compare_type=True)
 moment = Moment()
 db = SQLAlchemy()
 login_manager = LoginManager()

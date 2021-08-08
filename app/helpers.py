@@ -29,7 +29,7 @@ current_date = dt.date.today()
 expiration_default = dt.date.today() + dt.timedelta(days=90)
 
 
-class CustomJinjaFilters():
+class CustomJinjaFilters:
     @staticmethod
     def date_brz(dt):
         if dt:

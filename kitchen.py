@@ -10,10 +10,10 @@ from dotenv import load_dotenv
 from app import create_app, db
 from app.helpers import CustomJinjaFilters
 from app.clients.forms import RegisterClientForm
-from app.models import (User, Client, ClientCategory, Ingredient, Product, ProductCategory,
-                        Production, Sale, Supplier, User, Recipe, RecipeStep,
-                        Measurement, Quantity, PartialSale, Address, Unit)
+from app.models import (User, Client, ClientCategory, Product, ProductCategory,
+                        Production, Sale, PartialSale, Address, Unit)
 
+# Ingredient, Supplier, Recipe, RecipeStep, Measurement, Quantity,
 load_dotenv()
 
 config_name = os.getenv('FLASK_CONFIG') or 'default'
@@ -30,12 +30,13 @@ jinja2.filters.FILTERS['DATEBR'] = CustomJinjaFilters.date_brz
 @app.shell_context_processor
 def make_shell_context():
     return dict(db=db, User=User, Client=Client, ClientCategory=ClientCategory,
-                Ingredient=Ingredient, Product=Product, ProductCategory=ProductCategory,
-                Recipe=Recipe, RecipeStep=RecipeStep, Measurement=Measurement, Address=Address,
-                Production=Production, Sale=Sale, Supplier=Supplier, PartialSale=PartialSale,
+                Product=Product, ProductCategory=ProductCategory,
+                Address=Address, Production=Production, Sale=Sale, PartialSale=PartialSale,
                 Unit=Unit
                 )
 
+
+# Recipe=Recipe, RecipeStep=RecipeStep, Measurement=Measurement, Supplier=Supplier, Ingredient=Ingredient,
 
 @app.context_processor
 def override_url_for():

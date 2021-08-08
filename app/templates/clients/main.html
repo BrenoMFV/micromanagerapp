@@ -74,19 +74,19 @@
                     <tr>
                         <th scope="row">
                             <a href="#" onclick="get_client({{ client.client_id }}); return false;">
-                                {{ client.name|escape }}
+                                {{ client.name }}
                             </a>
                         </th>
                         <td>
                             <a target="_blank" rel="noopener noreferrer"
-                               href="https://web.whatsapp.com/send?phone='+55{{client.contact_number|escape}}">
+                               href="https://web.whatsapp.com/send?phone='+55{{client.phonenumber}}">
                                 {{ client.contact_number|escape }}</a>
                         </td>
-                        <td>{{ client.email|escape }}</td>
-                        <td>{{ client.category_name|escape|capitalize }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.category_name|capitalize }}</td>
                         <td>
                             <a href="https://www.google.com/maps/?q={{ location|join(', ') }}">
-                                {{ client.city|safe }}
+                                {{ client.city }}
                             </a>
                         </td>
                         <td>
