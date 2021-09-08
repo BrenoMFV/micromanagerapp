@@ -40,7 +40,8 @@ brazilian_states = [('AC', 'Acre'),
 
 
 def get_client_category():
-    return ClientCategory.query.options(db.load_only('category_id', 'category_name')).filter_by(user_id_fk=current_user.user_id)
+    return ClientCategory.query.options(db.load_only('category_id', 'category_name')).filter_by(
+        user_id_fk=current_user.user_id)
 
 
 class EditCategoryForm(FlaskForm):
@@ -54,14 +55,15 @@ class EditCategoryForm(FlaskForm):
 class RegisterClientForm(FlaskForm):
     name = StringField("Nome", validators=[DataRequired(message="O cliente deve possuir ao menos o nome."),
                                            Regexp(COMMON_REGEX, 0,
-                                           message='O nome do cliente deve possuir apenas letras, dígitos, espaços e hífens.')])
+                                                  message='O nome do cliente deve possuir apenas letras, dígitos, espaços e hífens.')])
 
     email = StringField(
         "E-mail", validators=[Optional(), Email(message="Endereço de email inválido.")])
     ddd = StringField("DDD", validators=[Optional(), Length(
         min=4, message='DDD incorreto'), Regexp(r"^\(\d{2}\)*$", 0, message="Telefone e DDD recebem apenas dígitos.")])
     phonenumber = TelField("Número", validators=[Optional(), Length(
-        min=10, max=10, message='9 dígitos, apenas números.'), Regexp(r"^(\d{5}\-\d{4})*$", 0, message="Telefone e DDD recebem apenas dígitos.")])
+        min=10, max=10, message='9 dígitos, apenas números.'), Regexp(r"^(\d{5}\-\d{4})*$", 0,
+                                                                      message="Telefone e DDD recebem apenas dígitos.")])
     category_name = QuerySelectField("Categoria do Cliente",
                                      query_factory=get_client_category,
                                      get_label='category_name')
@@ -77,7 +79,8 @@ class RegisterClientForm(FlaskForm):
 class RegisterClientCategoryForm(FlaskForm):
     category_name = StringField("Nova Categoria de Cliente", validators=[DataRequired(),
                                                                          Length(
-                                                                             max=32, message="A Categoria de Cliente pode ter no máximo 32 caractéres."),
+                                                                             max=32,
+                                                                             message="A Categoria de Cliente pode ter no máximo 32 caractéres."),
                                                                          Regexp(COMMON_REGEX, 0,
                                                                                 message='Categorias de clientes podem possuir apenas letras e dígitos.')])
     submit = SubmitField("Cadastrar Novo Tipo")

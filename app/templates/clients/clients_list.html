@@ -1,0 +1,110 @@
+{% extends 'layout.html' %}
+{% from "helpers.html" import render_field %}
+
+{% block content %}
+<div class="container">
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Seus Clientes
+        </div>
+        <div class="card-body">
+            <div class="table-responsive-lg">
+                <table class='table table-hover table-striped table-bordered table-responsive-lg' id="Clients">
+                    <thead>
+                    <tr>
+                        <th scope='col'>Cliente</th>
+                        <th scope='col'>Contato</th>
+                        <th scope='col'>Email</th>
+                        <th scope='col'>Categoria</th>
+                        <th scope='col'>Endereço</th>
+                        <td scope="col">Editar</td>
+                        <th scope='col'>Deletar</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for client in clients %}
+                    {% set location = [client.addresses[0].address, client.addresses[0].city] %}
+                    <tr>
+                        <th scope="row">
+                            <a href="#" onclick="get_client('{{ client.client_id }}'); return false;">
+                                {{ client.name }}
+                            </a>
+                        </th>
+                        <td>
+                            <a target="_blank" rel="noopener noreferrer"
+                               href="https://web.whatsapp.com/send?phone='+55{{ client.ddd }}{{client.phonenumber}}">
+                                {{ client.ddd }} {{ client.phonenumber }}</a>
+                        </td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.category.category_name|capitalize }}</td>
+                        <td>
+                            <a target="_blank" rel="noopener noreferrer"
+                               href="https://www.google.com/maps/?q={{ location|join('+') }}">
+                                {{ client.addresses[0].address }}
+                            </a>
+                        </td>
+                        <td>
+                            <i class="fas fa-edit"></i>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('.delete', client_id=client.client_id) }}"
+                               onclick="return confirm('Deletar esse cadastro não apagará as informações relacionadas,\ncomo o histórico de vendas ou suas transações.\n\nDeseja prosseguir?');">
+                                <i class="far fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'clients/edit_client_category_modal.html' %}
+{% include 'clients/register_client_category_modal.html' %}
+{% include 'clients/register_client_modal.html' %}
+{% include 'clients/edit_client_modal.html' %}
+
+{% endblock %}
+
+{% block script %}
+<script>
+	function get_client(id) {
+		data = { id: id }
+
+		$.ajax({
+			url: '{{ url_for(".client_profile") }}',
+			dataType: 'json',
+			method: "GET",
+			data: data,
+			success: function (response) {
+				$('#editClientModal').modal('show');
+
+				$("form#edit input[name='id']").val(response['id']);
+				$("form#edit input[name='name'").val(response['name']);
+
+				$("form#edit input[name='ddd']").val(response['ddd']);
+				$("form#edit input[name='phonenumber']").val(response['phonenumber']);
+
+				$("form#edit input[name='email']").val(response['email']);
+
+				$("form#edit input[name='address']").val(response['address']);
+				$("form#edit input[name='city']").val(response['city']);
+				$("form#edit select.edit_form option[value='" + response['state'] + "']").prop('selected', true);
+				$("form#edit input[name='observations']").val(response['observations']);
+
+				$("form#edit select.edit_form option[value='" + response['category_id'] + "']").prop('selected', true);
+				$("form#edit input[name='cpf']").val(response['cpf']);
+				$("form#edit input[name='cnpj']").val(response['cnpj']);
+			},
+			error: function (err) {
+				console.error(err);
+			}
+		});
+	}
+
+
+</script>
+{% endblock %}

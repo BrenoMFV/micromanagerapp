@@ -62,7 +62,7 @@ def main():
             'Preço ({})' .format(cc.category_name.lower().title())))
     editProductForm = EditProductForm()
     registerProductForm = RegisterProductForm()
-    return render_template("products/main.html",
+    return render_template("products/products_list.html",
                            products=products,
                            products_reserved=product_reserved,
                            cc_fields=cc_fields,

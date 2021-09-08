@@ -49,7 +49,7 @@ def main():
             }
             sale_products[sale.sale_id].append(
                 product_dict[product.product_id_fk])
-    return render_template('sales/main.html', sales=sales,
+    return render_template('sales/clients_list.html', sales=sales,
                            registerSaleForm=registerSaleForm,
                            sale_products=sale_products,
                            pdfForm=pdfForm)

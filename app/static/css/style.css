@@ -36,6 +36,11 @@ header nav.navbar {
     }
 }
 
+.form-control {
+    border: 1px solid #8dbbd7 !important;
+}
+   border-color: #d7fad7
+
 table {
     border-radius: 5px;
     text-align: center;

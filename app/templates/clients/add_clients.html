@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+{% from 'helpers.html' import render_field %}
+
+{% block title %}Adicionando novo Cliente{% endblock %}
+
+{% block content %}
+<div class="page-header">Cadastre seu cliente</div>
+<div class="container">
+    <form method="POST" action="{{ url_for('.register_client') }}"
+          class="form-group justify-content-center">
+        {{ form.csrf_token }}
+        <div class="row g-0 gy-2">
+            {{ render_field(form.name, class="form-control", div_class="col-md-8", required=True) }}
+            {{ render_field(form.category_name, class_= "form-control edit_form", div_class="col-md-4")|capitalize}}
+            {{ render_field(form.ddd, class_= "form-control ddd", div_class="col-md-2")}}
+            {{ render_field(form.phonenumber, class_= "form-control phone", div_class="col-md-4")}}
+            {{ render_field(form.email, class_= "form-control", div_class="col-md-6")}}
+            {{ render_field(form.address, class_="form-control", div_class="col-md-12")}}
+            {{ render_field(form.city, class="form-control", div_class="col-md-8") }}
+            {{ render_field(form.state, class="form-control", div_class="col-md-4") }}
+            {{ render_field(form.observations, class="form-control", div_class="col-md-12") }}
+            {{ render_field(form.cpf, class= "form-control cpf", div_class="col-md-6") }}
+            {{ render_field(form.cnpj, class= "form-control cnpj", div_class="col-md-6") }}
+        <br>
+        {{ form.submit(class_="btn btn-success text-center") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

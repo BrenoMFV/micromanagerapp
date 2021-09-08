@@ -122,7 +122,7 @@ class Client(db.Model):
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     category_id_fk = db.Column(db.Integer, db.ForeignKey('clients_categories.category_id'))
     user = db.relationship('User', back_populates='clients')
-    addresses = db.relationship('Address', backref='client', lazy='dynamic')
+    addresses = db.relationship('Address', backref='client', lazy='joined')
     purchases = db.relationship('Sale', backref='client', lazy='dynamic')
 
     deleted = db.Column(db.Boolean(), default=False)
@@ -139,6 +139,7 @@ class Address(db.Model):
     city = db.Column(db.String(32))
     state = db.Column(db.String(2))
     observations = db.Column(db.String(128))
+    # client = db.relationship('Client', backref='address', lazy='joined')
     client_id_fk = db.Column(UUID(as_uuid=True), db.ForeignKey('clients.client_id'))
     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 

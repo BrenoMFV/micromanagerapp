@@ -32,7 +32,7 @@ def user_account():
     form.last_name.data = current_user.last_name
     form.company_name.data = current_user.company_name
     form.cnpj.data = current_user.cnpj
-    return render_template('account/user.html', editUserForm=form, 
+    return render_template('account/user_info.html', editUserForm=form,
                                                 changePasswordForm=changePasswordForm, 
                                                 changeEmailForm=changeEmailForm,
                                                 resendEmailConfirmationForm=resendEmailConfirmationForm)

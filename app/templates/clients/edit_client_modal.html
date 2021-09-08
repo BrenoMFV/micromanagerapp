@@ -1,51 +1,39 @@
 <!-- Modal for Edit Client -->
 <div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header text-center">
-				<h5 class="modal-title" id="editClientModalLabel">Editando Informações do Cliente</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<form id="edit" method="POST" action="{{ url_for('.update_client') }}"
-					class="form-group justify-content-center">
-					{{ registerClientForm.csrf_token }}
-					<div class="row g-3">
-						{{ render_field(registerClientForm.name, class="form-control", div_class="col-md-12") }}
-					</div>
-					<div class="row g-3">
-						{{ render_field(registerClientForm.ddd, class_= "form-control ddd", div_class="col-md-2")}}
-						{{ render_field(registerClientForm.phonenumber, class_= "form-control phone",
-						div_class="col-md-4")}}
-						{{ render_field(registerClientForm.category_name, class_= "form-control edit_form",
-						div_class="col-md-6")|
-						capitalize}}
-					</div>
-					<div class="row g-3">
-						{{ render_field(registerClientForm.email, class_= "form-control", div_class="col-md-12") }}
-					</div>
-					<div class="row g-3">
-						{{ render_field(registerClientForm.address, class_="form-control", div_class="col-md-12") }}
-					</div>
-					<div class="row g-3">
-						{{ render_field(registerClientForm.city, class="form-control", div_class="col-md-8") }}
-						{{ render_field(registerClientForm.state, class="form-control edit_form", div_class="col-md-4")
-						}}
-					</div>
-					<div class="row g-3">
-						{{ render_field(registerClientForm.observations, class="form-control", div_class="col-md-12") }}
-					</div>
-					<div class="row g-3">
-						{{ render_field(registerClientForm.cpf, class= "form-control cpf", div_class="col-md-6") }}
-						{{ render_field(registerClientForm.cnpj, class= "form-control cnpj", div_class="col-md-6") }}
-					</div>
-					<input type="number" name='id' class='disabled'>
-					<div class="modal-footer">
-						{{ registerClientForm.submit(class_="btn btn-green w-100 text-center") }}
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="editClientModalLabel">Editando Informações do Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit" method="POST" action="{{ url_for('.update_client') }}"
+                      class="form-group justify-content-center">
+                    {{ registerClientForm.csrf_token }}
+                    <div class="row g-3">
+                        {{ render_field(registerClientForm.name, class="form-control", div_class="col-md-12") }}
+                        {{ render_field(registerClientForm.ddd, class_= "form-control ddd", div_class="col-md-2")}}
+                        {{ render_field(registerClientForm.phonenumber, class_= "form-control phone",
+                        div_class="col-md-4")}}
+                        {{ render_field(registerClientForm.category_name, class_= "form-control edit_form",
+                        div_class="col-md-6")|
+                        capitalize}}
+                        {{ render_field(registerClientForm.email, class_= "form-control", div_class="col-md-12") }}
+                        {{ render_field(registerClientForm.address, class_="form-control", div_class="col-md-12") }}
+                        {{ render_field(registerClientForm.city, class="form-control", div_class="col-md-8") }}
+                        {{ render_field(registerClientForm.state, class="form-control edit_form", div_class="col-md-4")
+                        }}
+                        {{ render_field(registerClientForm.observations, class="form-control", div_class="col-md-12") }}
+                        {{ render_field(registerClientForm.cpf, class= "form-control cpf", div_class="col-md-6") }}
+                        {{ render_field(registerClientForm.cnpj, class= "form-control cnpj", div_class="col-md-6") }}
+                    </div>
+                    <input type="text" name='id' class='disabled'>
+                    <div class="modal-footer">
+                        {{ registerClientForm.submit(class_="btn btn-green w-100 text-center") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- end of edit client category modal -->

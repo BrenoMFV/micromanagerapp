@@ -1,6 +1,6 @@
-{% macro render_field(field, div_class="form-group") %}
+{% macro render_field(field, div_class="form-group", required=False) %}
 
-<div class="{{ div_class }} ">{{ field.label(class_="form-label") }}
+<div class="{{ div_class }} ">{{ field.label(class_="form-label") }}{% if required %}<span style="color:red; font-weight:bold;">*</span>{% endif %}
   {{ field(**kwargs)|safe }}
   <small>Mensagem de Erro</small>
 </div>
